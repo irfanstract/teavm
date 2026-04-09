@@ -1,0 +1,28 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+essential
+.vscode/
+
+# Java
+*.class
+/out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rust toolchain artifacts often in parent drives
+.rustup/
+.cargo/
+
+# Temporary files
+*.log
+*.tmp

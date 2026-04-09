@@ -1,0 +1,20 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':service')
+    implementation project(':core')
+}
+
+application {
+    mainClass = 'com.example.app.Main'
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
