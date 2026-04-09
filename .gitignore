@@ -1,4 +1,5 @@
 # Gradle
+.gradle-dist/
 .gradle/
 build/
 **/build/
@@ -12,6 +13,7 @@ essential
 .vscode/
 
 # Java
+/.jdks/
 *.class
 /out/
 
