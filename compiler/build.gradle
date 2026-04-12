@@ -1,9 +1,15 @@
 dependencies {
     implementation project(':core')
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+    testImplementation 'junit:junit:4.13.2'
 
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+
+    implementation project(':interop-core')
+
+    // hppc used widely across compiler internals
+    implementation 'com.carrotsearch:hppc:0.8.1'
 
     implementation 'org.ow2.asm:asm:9.8'
     implementation 'org.ow2.asm:asm-commons:9.8'

@@ -1,2 +1,5 @@
 rootProject.name = 'multi-module-demo'
-include 'core', 'compiler', 'service', 'app'
+include ':core', ':compiler', ':interop-core', ':service', ':app'
+
+// Map the logical ':interop-core' project to the existing directory 'interop/core'
+project(':interop-core').projectDir = file('interop/core')
