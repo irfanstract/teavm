@@ -19,6 +19,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * <p> a subclass of {@link ElementReader} for classes. It provides methods to read class-specific information, such as parent class, interfaces, methods and fields.
+ * 
+ */
 public interface ClassReader extends ElementReader {
     GenericTypeParameter[] getGenericParameters();
 

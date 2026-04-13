@@ -18,6 +18,16 @@ package org.teavm.model;
 import java.io.Serializable;
 import java.util.Arrays;
 
+/**
+ * <p> specifies method name and signature. Signature is an array of types, where the last type is a return type, and the rest are parameter types. </p>
+ * 
+ * @implNote
+ * 
+ * TODO: erased types as used in 'type descriptor's, are conventionally called "type descriptor"s; please reword
+ * 
+ * TODO: consider turning this into `record`. thought about making such change, but {@link #MethodDescriptor(String, ValueType...) <code>signature</code> being varargs} got me backing off
+ * 
+ */
 public class MethodDescriptor implements Serializable {
     private String name;
     private ValueType[] signature;

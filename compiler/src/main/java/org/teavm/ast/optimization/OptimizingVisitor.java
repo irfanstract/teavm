@@ -72,6 +72,14 @@ import org.teavm.model.MethodReference;
 import org.teavm.model.TextLocation;
 import org.teavm.model.ValueType;
 
+/**
+ * a visitor that performs various optimizations on the AST, such as constant folding, dead code elimination, copy propagation and so on. It uses information about variable usage frequencies and constants to optimize expressions and statements. It also uses location information to avoid optimizing code that is not friendly to debugger, such as code that has different location than the current one. It is used in {@link Optimizer} to optimize the AST of a method before generating bytecode for it.
+ * 
+ * <p> the main idea of this visitor is to traverse the AST and optimize expressions and statements based on the information about variable usage frequencies and constants. For example, if a variable is written only once and read only once, and it has a constant value, then it can be replaced with the constant value in the expression where it is read. If an expression is a binary operation with a constant operand, then it can be evaluated at compile time and replaced with the result. If a statement is an assignment to a variable that is never read, then it can be removed from the AST. And so on.
+ * 
+ * @apiNote i think this should be made `public`.
+ * 
+ */
 class OptimizingVisitor implements StatementVisitor, ExprVisitor {
     private static final int MAX_DEPTH = 20;
     private Expr resultExpr;
@@ -100,10 +108,17 @@ class OptimizingVisitor implements StatementVisitor, ExprVisitor {
         this.classes = classes;
     }
 
+    /**
+     * checks if the given expression is a constant zero. This can be used to optimize expressions like `x + 0` or `x * 0`, which can be simplified to `x` and `0` respectively. It can also be used to optimize comparisons with zero, such as `x == 0` or `x < 0`, which can be simplified to `x == 0` and `x < 0` respectively.
+     * 
+     */
     private static boolean isZero(Expr expr) {
         return expr instanceof ConstantExpr && Integer.valueOf(0).equals(((ConstantExpr) expr).getValue());
     }
 
+    /**
+     * checks if the given expression is a comparison of the form `x < y` or `x > y`, which can be optimized when compared with zero. For example, if we have an expression like `(x < y) == 0`, it can be optimized to `x >= y`, and if we have an expression like `(x > y) == 0`, it can be optimized to `x <= y`. This can be done by checking if the expression is a binary expression with a comparison operation, and if its type is int or long.
+     */
     private static boolean isComparison(Expr expr) {
         if (!(expr instanceof BinaryExpr)) {
             return false;
@@ -116,6 +131,9 @@ class OptimizingVisitor implements StatementVisitor, ExprVisitor {
                 || binary.getOperation() == BinaryOperation.COMPARE_GREATER;
     }
 
+    /**
+     * checks if the given expression is a comparison of the form `x < y` or `x > y`, which can be optimized when compared with zero. For example, if we have an expression like `(x < y) == 0`, it can be optimized to `x >= y`, and if we have an expression like `(x > y) == 0`, it can be optimized to `x <= y`. This can be done by checking if the expression is a binary expression with a comparison operation, and if its type is float or double.
+     */
     private static boolean isComparisonLess(Expr expr) {
         if (!(expr instanceof BinaryExpr)) {
             return false;
@@ -128,6 +146,9 @@ class OptimizingVisitor implements StatementVisitor, ExprVisitor {
     }
 
 
+    /**
+     * checks if the given expression is a comparison of the form `x < y` or `x > y`, which can be optimized when compared with zero. For example, if we have an expression like `(x < y) == 0`, it can be optimized to `x >= y`, and if we have an expression like `(x > y) == 0`, it can be optimized to `x <= y`. This can be done by checking if the expression is a binary expression with a comparison operation, and if its type is float or double.
+     */
     private static boolean isComparisonGreater(Expr expr) {
         if (!(expr instanceof BinaryExpr)) {
             return false;
@@ -140,8 +161,13 @@ class OptimizingVisitor implements StatementVisitor, ExprVisitor {
     }
 
 
+    /**
+     * pushes the given location to the location stack, and updates the current location if the given location is not null. This can be used to keep track of the current location in the AST, so that we can avoid optimizing code that is not friendly to debugger. For example, if we are optimizing an expression that has a different location than the current one, we may want to skip optimizing it, because it may cause issues with debugging.
+     * 
+     */
     private void pushLocation(TextLocation location) {
         locationStack.push(location);
+        /* if the location is not null, we update the current location to it, and push the previous current location to the not null location stack if it is not null. This way, we can keep track of the current location and restore it later when we pop the location stack. */
         if (location != null) {
             if (currentLocation != null) {
                 notNullLocationStack.push(currentLocation);
@@ -150,7 +176,11 @@ class OptimizingVisitor implements StatementVisitor, ExprVisitor {
         }
     }
 
+    /**
+     * pops the current location from the location stack, and updates the current location to the previous one if the popped location is not null. This can be used to restore the previous location after we are done optimizing an expression or statement that has a different location than the current one. For example, if we are optimizing an expression that has a different location than the current one, we may want to skip optimizing it, because it may cause issues with debugging. After we are done optimizing it, we can pop the location and restore the previous one.
+     */
     private void popLocation() {
+        /* if the popped location is not null, we restore the previous current location from the not null location stack if it is not empty. This way, we can keep track of the current location and restore it later when we pop the location stack. */
         if (locationStack.pop() != null) {
             currentLocation = notNullLocationStack.pollFirst();
         }

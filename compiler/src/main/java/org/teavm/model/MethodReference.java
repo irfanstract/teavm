@@ -32,16 +32,9 @@ import java.util.stream.Stream;
  * adjust the JVM's behavior.</p>
  *
  * @author Alexey Andreev
+ * @author contributors
  */
-public class MethodReference implements Serializable {
-    private String className;
-    private MethodDescriptor descriptor;
-    private transient int hash;
-
-    public MethodReference(String className, MethodDescriptor descriptor) {
-        this.className = className;
-        this.descriptor = descriptor;
-    }
+public record MethodReference(String className, MethodDescriptor descriptor) implements Serializable {
 
     /**
      * <p>Creates a new reference to a method.</p>
@@ -109,6 +102,7 @@ public class MethodReference implements Serializable {
 
     @Override
     public int hashCode() {
+        int hash = 0;
         if (hash == 0) {
             hash = (className.hashCode() * 31 + descriptor.hashCode()) * 17;
             if (hash == 0) {

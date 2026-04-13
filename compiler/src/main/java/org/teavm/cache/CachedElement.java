@@ -21,6 +21,11 @@ import org.teavm.model.AnnotationContainerReader;
 import org.teavm.model.ElementModifier;
 import org.teavm.model.ElementReader;
 
+/**
+ * <p> a class that represents cached information about a class, method or field. It implements {@link ElementReader} interface, so it can be used to read access level, modifiers, name and annotations of the element.
+ * it is used to store information about classes, methods and fields in cache, so it can be retrieved faster than reading from class files. It is also used to read information about classes, methods and fields from annotations.
+ * 
+ */
 class CachedElement implements ElementReader {
     EnumSet<ElementModifier> modifiers;
     CachedAnnotations annotations;

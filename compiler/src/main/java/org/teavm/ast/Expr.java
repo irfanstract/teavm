@@ -26,19 +26,73 @@ public abstract class Expr implements Cloneable {
 
     public abstract void acceptVisitor(ExprVisitor visitor);
 
+    /**
+     * returns the index of the variable represented by this expression, or -1 if this expression does not represent a variable.
+     * 
+     * <p>
+     * this method is used to determine whether this expression represents a variable, and if so, which variable it represents.
+     * the variable index is an integer that uniquely identifies a variable within a method. It is assigned by the compiler during the variable allocation phase, and is used to refer to the variable in various parts of the compiler, such as in variable expressions and in variable declarations.
+     * if this expression does not represent a variable, this method returns -1. This is the default value of the variable index, and it indicates that this expression is not a variable expression.
+     * if this expression represents a variable, this method returns the index of that variable. The variable index is a non-negative integer that uniquely identifies the variable within the method. It is assigned by the compiler during the variable allocation phase, and it is used to refer to the variable in various parts of the compiler, such as in variable expressions and in variable declarations.
+     * <br/> see `OptimizingVisitor.java`. in that class, the variable index is used to determine whether a variable expression represents a specific variable that is being optimized, and to replace it with a constant expression if it does.
+     * <br/> see `VariableExpr.java`. in that class, the variable index is set to the index of the variable that the expression represents, and it is used to determine which variable is being referred to by the expression.
+     * <br/> see `Expr.java`. in that class, the variable index is defined as a field of the `Expr` class, and it is used to store the index of the variable that the expression represents. The `getVariableIndex()` method is used to retrieve this index, and the `setVariableIndex(int variableIndex)` method is used to set it.
+     * 
+     * @see #setVariableIndex(int)
+     * @see VariableExpr
+     */
     public int getVariableIndex() {
         return variableIndex;
     }
 
+    /**
+     * assigns the value for {@link #getVariableIndex()} to return.
+     * 
+     */
     public void setVariableIndex(int variableIndex) {
         this.variableIndex = variableIndex;
     }
 
+    /**
+     * creates and returns a copy of this object.
+     * 
+     * <p>
+     * calls {@link #clone(Map) the one-arg `clone(Map)` method} internally, passing it a new empty map to keep track of already cloned expressions.
+     * 
+     * @see java.lang.Object#clone
+     * @see java.lang.Cloneable
+     */
     @Override
     public Expr clone() {
         return clone(new HashMap<>());
     }
 
+    /**
+     * called internally by {@link #clone() the no-arg `clone()` method}.
+     * <br/>
+     * {@code cache} will contain mappings from original expressions to their clones. This is used to avoid infinite recursion when cloning cyclic structures.
+     * 
+     * <p>
+     * by convention, the returned object should be obtained by calling
+     * {@code super.clone}.  If a class and all of its superclasses (except
+     * {@code Object}) obey this convention, it will be the case that
+     * {@code x.clone().getClass() == x.getClass()}.
+     * <p>
+     * by convention, the object returned by this method should be independent of this object (which is being cloned).
+     * to achieve this independence,
+     * it may be necessary to modify one or more fields of the object returned by {@code super.clone} before returning it.
+     * typically, this means
+     * copying any mutable objects that comprise the internal "deep structure"
+     * of the object being cloned and replacing the references to these
+     * objects with references to the copies. 
+     * if a class contains only primitive fields or references to immutable objects, then
+     * it is usually the case that
+     * no fields in the object returned by {@code super.clone} need to be modified.
+     * 
+     * @param cache a map of already cloned expressions, used to avoid infinite recursion when cloning cyclic structures
+     * 
+     * @return a clone of this expression
+     */
     protected abstract Expr clone(Map<Expr, Expr> cache);
 
     public static Expr constant(Object value) {

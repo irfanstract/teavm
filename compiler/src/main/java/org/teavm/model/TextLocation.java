@@ -18,14 +18,14 @@ package org.teavm.model;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class TextLocation implements Serializable {
+/**
+ * <p> models a location in source code, which can be used for debugging and error reporting. It contains file name, line number and inlining information. It is used to store location information for classes, methods and fields, so it can be retrieved faster than reading from class files. It is also used to read location information from annotations.
+ * 
+ * 
+ */
+public record TextLocation(String fileName, int line, InliningInfo inlining) implements Serializable {
     public static final TextLocation EMPTY = new TextLocation(null, -1);
     private static final InliningInfo[] EMPTY_ARRAY = new InliningInfo[0];
-
-    private String fileName;
-    private int line;
-    private InliningInfo inlining;
-    private transient int hash;
 
     public TextLocation(String fileName, int line) {
         this(fileName, line, null);
@@ -77,6 +77,7 @@ public class TextLocation implements Serializable {
 
     @Override
     public int hashCode() {
+        int hash = 0;
         int result = hash;
         if (result == 0) {
             final int prime = 31;

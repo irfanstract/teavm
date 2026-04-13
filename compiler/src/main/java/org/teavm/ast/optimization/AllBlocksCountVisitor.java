@@ -38,7 +38,7 @@ import org.teavm.ast.ThrowStatement;
 import org.teavm.ast.TryCatchStatement;
 import org.teavm.ast.WhileStatement;
 
-class AllBlocksCountVisitor implements StatementVisitor {
+public class AllBlocksCountVisitor implements StatementVisitor {
     private Map<IdentifiedStatement, Integer> blocksCount = new HashMap<>();
     private IdentifiedStatement currentBlock;
     private boolean last = true;

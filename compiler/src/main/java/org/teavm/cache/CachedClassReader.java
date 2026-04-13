@@ -27,6 +27,14 @@ import org.teavm.model.GenericValueType;
 import org.teavm.model.MethodDescriptor;
 import org.teavm.model.MethodReader;
 
+/**
+ * <p> cached class reader. subclasses {@link CachedElement} and implements {@link ClassReader}.
+ * it is used to store information about classes in cache, so it can be retrieved faster than reading from class files.
+ * it is also used to read information about classes from annotations.
+ * 
+ * <p> instantiated by {@link ClassIO#readClass(java.io.InputStream, String)} when reading class information from class files or annotations. it stores information about class, such as parent class, interfaces, methods and fields.
+ * 
+ */
 class CachedClassReader extends CachedElement implements ClassReader {
     String parent;
     GenericTypeParameter[] parameters;

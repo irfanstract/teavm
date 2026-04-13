@@ -17,6 +17,19 @@ package org.teavm.model;
 
 import java.util.EnumSet;
 
+/**
+ * 
+ * <p> defines methods to retrieve information/stats of the element.
+ * subclasses of this interface are {@link ClassReader}, {@link MethodReader} and {@link FieldReader}.
+ * each of these interfaces defines additional methods to read specific information about the element.
+ * for example, {@link ClassReader} defines methods to read parent class, interfaces, methods and fields of the class.
+ * {@link MethodReader} defines methods to read method parameters and return type.
+ * {@link FieldReader} defines methods to read field type.
+ * 
+ * <p> this interface is used to read class, method and field information from class files and from cache.
+ * it is also used to read class, method and field information from annotations.
+ * 
+ */
 public interface ElementReader {
     AccessLevel getLevel();
 
