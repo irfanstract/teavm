@@ -6,7 +6,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 
-    implementation project(':interop-core')
+    implementation project(':interopCore')
 
     // hppc used widely across compiler internals
     implementation 'com.carrotsearch:hppc:0.8.1'
