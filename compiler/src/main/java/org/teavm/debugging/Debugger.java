@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-// import org.teavm.backend.wasm.debug.info.DebugInfo;
-// import org.teavm.backend.wasm.debug.info.LineInfoFileCommand;
-// import org.teavm.backend.wasm.debug.info.MethodInfo;
-// import org.teavm.backend.wasm.debug.info.StepLocationsFinder;
+import org.teavm.backend.wasm.debug.info.DebugInfo;
+import org.teavm.backend.wasm.debug.info.LineInfoFileCommand;
+import org.teavm.backend.wasm.debug.info.MethodInfo;
+import org.teavm.backend.wasm.debug.info.StepLocationsFinder;
 // import org.teavm.backend.wasm.debug.parser.DebugInfoParser;
 import org.teavm.common.ByteArrayAsyncInputStream;
 import org.teavm.common.Promise;
@@ -60,9 +60,9 @@ public class Debugger {
     private Predicate<JavaScriptBreakpoint> temporaryBreakpointHandler;
     private Map<JavaScriptScript, DebugInformation> debugInformationMap = new HashMap<>();
     private Map<String, Set<DebugInformation>> debugInformationFileMap = new HashMap<>();
-    // private Map<JavaScriptScript, DebugInfo> wasmDebugInfoMap = new HashMap<>();
-    // private Map<DebugInfo, JavaScriptScript> wasmScriptMap = new HashMap<>();
-    // private Map<String, Set<DebugInfo>> wasmInfoFileMap = new HashMap<>();
+    private Map<JavaScriptScript, DebugInfo> wasmDebugInfoMap = new HashMap<>();
+    private Map<DebugInfo, JavaScriptScript> wasmScriptMap = new HashMap<>();
+    private Map<String, Set<DebugInfo>> wasmInfoFileMap = new HashMap<>();
     private Map<DebugInformation, JavaScriptScript> scriptMap = new HashMap<>();
     private Map<JavaScriptBreakpoint, Breakpoint> breakpointMap = new HashMap<>();
     private Set<Breakpoint> breakpoints = new LinkedHashSet<>();
@@ -70,7 +70,7 @@ public class Debugger {
     private CallFrame[] callStack;
     private Set<String> scriptNames = new LinkedHashSet<>();
     private Set<String> allSourceFiles = new LinkedHashSet<>();
-    // private StepLocationsFinder wasmStepLocationsFinder;
+    private StepLocationsFinder wasmStepLocationsFinder;
 
     public Debugger(JavaScriptDebugger javaScriptDebugger, DebugInformationProvider debugInformationProvider) {
         this.javaScriptDebugger = javaScriptDebugger;
@@ -133,13 +133,13 @@ public class Debugger {
                 case JS:
                     hasSuccessors = addJsBreakpoints(frame, script, enterMethod, successors);
                     break;
-                // case WASM: {
-                //     var promise = stepWasm(frame, enterMethod);
-                //     if (promise != null) {
-                //         return promise;
-                //     }
-                //     break;
-                // }
+                case WASM: {
+                    var promise = stepWasm(frame, enterMethod);
+                    if (promise != null) {
+                        return promise;
+                    }
+                    break;
+                }
                 default:
                     break;
             }
@@ -191,31 +191,31 @@ public class Debugger {
         return true;
     }
 
-    // private Promise<Void> stepWasm(CallFrame frame, boolean enterMethod) {
-    //     var debugInfo = wasmDebugInfoMap.get(frame.getOriginalLocation().getScript());
-    //     if (debugInfo == null || debugInfo.controlFlow() == null || debugInfo.lines() == null) {
-    //         return null;
-    //     }
-    //     if (wasmStepLocationsFinder == null || wasmStepLocationsFinder.debugInfo != debugInfo) {
-    //         wasmStepLocationsFinder = new StepLocationsFinder(debugInfo);
-    //     }
-    //     wasmStepLocationsFinder.step(frame.getLocation().getFileName(), frame.getLocation().getLine(),
-    //             frame.getOriginalLocation().getColumn(), enterMethod);
+    private Promise<Void> stepWasm(CallFrame frame, boolean enterMethod) {
+        var debugInfo = wasmDebugInfoMap.get(frame.getOriginalLocation().getScript());
+        if (debugInfo == null || debugInfo.controlFlow() == null || debugInfo.lines() == null) {
+            return null;
+        }
+        if (wasmStepLocationsFinder == null || wasmStepLocationsFinder.debugInfo != debugInfo) {
+            wasmStepLocationsFinder = new StepLocationsFinder(debugInfo);
+        }
+        wasmStepLocationsFinder.step(frame.getLocation().getFileName(), frame.getLocation().getLine(),
+                frame.getOriginalLocation().getColumn(), enterMethod);
 
-    //     var locations = new ArrayList<JavaScriptLocation>();
-    //     for (var breakpointAddress : wasmStepLocationsFinder.getBreakpointAddresses()) {
-    //         locations.add(new JavaScriptLocation(frame.getOriginalLocation().getScript(), 0, breakpointAddress));
-    //     }
-    //     var callAddresses = IntHashSet.from(wasmStepLocationsFinder.getCallAddresses());
-    //     var result = createTemporaryBreakpoints(locations, br -> {
-    //         if (br != null && br.isValid() && callAddresses.contains(br.getLocation().getColumn())) {
-    //             destroyTemporaryBreakpoints().thenVoid(x -> javaScriptDebugger.stepInto());
-    //             return true;
-    //         }
-    //         return false;
-    //     });
-    //     return result.thenVoid(x -> javaScriptDebugger.stepOut());
-    // }
+        var locations = new ArrayList<JavaScriptLocation>();
+        for (var breakpointAddress : wasmStepLocationsFinder.getBreakpointAddresses()) {
+            locations.add(new JavaScriptLocation(frame.getOriginalLocation().getScript(), 0, breakpointAddress));
+        }
+        var callAddresses = IntHashSet.from(wasmStepLocationsFinder.getCallAddresses());
+        var result = createTemporaryBreakpoints(locations, br -> {
+            if (br != null && br.isValid() && callAddresses.contains(br.getLocation().getColumn())) {
+                destroyTemporaryBreakpoints().thenVoid(x -> javaScriptDebugger.stepInto());
+                return true;
+            }
+            return false;
+        });
+        return result.thenVoid(x -> javaScriptDebugger.stepOut());
+    }
 
     static class CallSiteSuccessorFinder implements DebuggerCallSiteVisitor {
         private DebugInformation debugInfo;
@@ -280,10 +280,10 @@ public class Debugger {
         return list != null ? new ArrayList<>(list) : Collections.emptyList();
     }
 
-    // private List<DebugInfo> wasmLineInfoBySource(String sourceFile) {
-    //     var list = wasmInfoFileMap.get(sourceFile);
-    //     return list != null ? new ArrayList<>(list) : Collections.emptyList();
-    // }
+    private List<DebugInfo> wasmLineInfoBySource(String sourceFile) {
+        var list = wasmInfoFileMap.get(sourceFile);
+        return list != null ? new ArrayList<>(list) : Collections.emptyList();
+    }
 
     public Promise<Void> continueToLocation(SourceLocation location) {
         return continueToLocation(location.getFileName(), location.getLine());
@@ -355,27 +355,27 @@ public class Debugger {
                 }));
             }
         }
-        // for (var wasmDebugInfo : wasmLineInfoBySource(location.getFileName())) {
-        //     if (wasmDebugInfo.lines() == null) {
-        //         continue;
-        //     }
-        //     for (var sequence : wasmDebugInfo.lines().sequences()) {
-        //         for (var loc : sequence.unpack().locations()) {
-        //             if (loc.location() == null) {
-        //                 continue;
-        //             }
-        //             if (loc.location().line() == location.getLine()
-        //                     && loc.location().file().fullName().equals(location.getFileName())) {
-        //                 var jsLocation = new JavaScriptLocation(wasmScriptMap.get(wasmDebugInfo),
-        //                         0, loc.address() + wasmDebugInfo.offset());
-        //                 promises.add(javaScriptDebugger.createBreakpoint(jsLocation).thenVoid(jsBreakpoint -> {
-        //                     jsBreakpoints.add(jsBreakpoint);
-        //                     breakpointMap.put(jsBreakpoint, breakpoint);
-        //                 }));
-        //             }
-        //         }
-        //     }
-        // }
+        for (var wasmDebugInfo : wasmLineInfoBySource(location.getFileName())) {
+            if (wasmDebugInfo.lines() == null) {
+                continue;
+            }
+            for (var sequence : wasmDebugInfo.lines().sequences()) {
+                for (var loc : sequence.unpack().locations()) {
+                    if (loc.location() == null) {
+                        continue;
+                    }
+                    if (loc.location().line() == location.getLine()
+                            && loc.location().file().fullName().equals(location.getFileName())) {
+                        var jsLocation = new JavaScriptLocation(wasmScriptMap.get(wasmDebugInfo),
+                                0, loc.address() + wasmDebugInfo.offset());
+                        promises.add(javaScriptDebugger.createBreakpoint(jsLocation).thenVoid(jsBreakpoint -> {
+                            jsBreakpoints.add(jsBreakpoint);
+                            breakpointMap.put(jsBreakpoint, breakpoint);
+                        }));
+                    }
+                }
+            }
+        }
         breakpoint.jsBreakpoints = jsBreakpoints;
 
         return Promise.allVoid(promises);
@@ -415,18 +415,18 @@ public class Debugger {
             for (var jsFrame : javaScriptDebugger.getCallStack()) {
                 List<SourceLocationWithMethod> locations;
                 DebugInformation debugInformation = null;
-                // DebugInfo wasmDebugInfo = null;
+                DebugInfo wasmDebugInfo = null;
                 switch (jsFrame.getLocation().getScript().getLanguage()) {
                     case JS:
                         debugInformation = debugInformationMap.get(jsFrame.getLocation().getScript());
                         locations = mapJsFrames(jsFrame, debugInformation);
                         break;
-                    // case WASM:
-                    //     locations = mapWasmFrames(jsFrame);
-                    //     if (!locations.isEmpty()) {
-                    //         wasmDebugInfo = wasmDebugInfoMap.get(jsFrame.getLocation().getScript());
-                    //     }
-                    //     break;
+                    case WASM:
+                        locations = mapWasmFrames(jsFrame);
+                        if (!locations.isEmpty()) {
+                            wasmDebugInfo = wasmDebugInfoMap.get(jsFrame.getLocation().getScript());
+                        }
+                        break;
                     default:
                         locations = Collections.emptyList();
                         break;
@@ -435,7 +435,7 @@ public class Debugger {
                     var loc = locWithMethod.loc;
                     var method = locWithMethod.method;
                     if (!locWithMethod.empty || !wasEmpty) {
-                        frames.add(new CallFrame(this, jsFrame, loc, method, debugInformation/* , wasmDebugInfo */));
+                        frames.add(new CallFrame(this, jsFrame, loc, method, debugInformation, wasmDebugInfo));
                     }
                     wasEmpty = locWithMethod.empty;
                 }
@@ -473,43 +473,43 @@ public class Debugger {
         return Collections.singletonList(new SourceLocationWithMethod(empty, loc, method));
     }
 
-    // private List<SourceLocationWithMethod> mapWasmFrames(JavaScriptCallFrame frame) {
-    //     var debugInfo = wasmDebugInfoMap.get(frame.getLocation().getScript());
-    //     if (debugInfo == null) {
-    //         return Collections.emptyList();
-    //     }
-    //     var lineInfo = debugInfo.lines();
-    //     if (lineInfo == null) {
-    //         return Collections.emptyList();
-    //     }
-    //     var address = frame.getLocation().getColumn() - debugInfo.offset();
-    //     var sequence = lineInfo.find(address);
-    //     if (sequence == null) {
-    //         return Collections.emptyList();
-    //     }
-    //     var instructionLocation = sequence.unpack().find(address);
-    //     if (instructionLocation == null) {
-    //         return Collections.emptyList();
-    //     }
+    private List<SourceLocationWithMethod> mapWasmFrames(JavaScriptCallFrame frame) {
+        var debugInfo = wasmDebugInfoMap.get(frame.getLocation().getScript());
+        if (debugInfo == null) {
+            return Collections.emptyList();
+        }
+        var lineInfo = debugInfo.lines();
+        if (lineInfo == null) {
+            return Collections.emptyList();
+        }
+        var address = frame.getLocation().getColumn() - debugInfo.offset();
+        var sequence = lineInfo.find(address);
+        if (sequence == null) {
+            return Collections.emptyList();
+        }
+        var instructionLocation = sequence.unpack().find(address);
+        if (instructionLocation == null) {
+            return Collections.emptyList();
+        }
 
-    //     var location = instructionLocation.location();
-    //     var result = new ArrayList<SourceLocationWithMethod>();
-    //     while (true) {
-    //         var loc = new SourceLocation(location.file().fullName(), location.line());
-    //         var inlining = location.inlining();
-    //         var method = inlining != null ? inlining.method() : sequence.method();
-    //         result.add(new SourceLocationWithMethod(false, loc, getMethodReference(method)));
-    //         if (inlining == null) {
-    //             break;
-    //         }
-    //         location = inlining.location();
-    //     }
-    //     return result;
-    // }
+        var location = instructionLocation.location();
+        var result = new ArrayList<SourceLocationWithMethod>();
+        while (true) {
+            var loc = new SourceLocation(location.file().fullName(), location.line());
+            var inlining = location.inlining();
+            var method = inlining != null ? inlining.method() : sequence.method();
+            result.add(new SourceLocationWithMethod(false, loc, getMethodReference(method)));
+            if (inlining == null) {
+                break;
+            }
+            location = inlining.location();
+        }
+        return result;
+    }
 
-    // private MethodReference getMethodReference(MethodInfo methodInfo) {
-    //     return new MethodReference(methodInfo.cls().fullName(), methodInfo.name(), ValueType.VOID);
-    // }
+    private MethodReference getMethodReference(MethodInfo methodInfo) {
+        return new MethodReference(methodInfo.cls().fullName(), methodInfo.name(), ValueType.VOID);
+    }
 
     Promise<Map<String, Variable>> createVariables(JavaScriptCallFrame jsFrame, DebugInformation debugInformation) {
         return jsFrame.getVariables().then(jsVariables -> {
@@ -529,41 +529,41 @@ public class Debugger {
         });
     }
 
-    // Promise<Map<String, Variable>> createVariables(JavaScriptCallFrame jsFrame, DebugInfo debugInfo) {
-    //     return jsFrame.getVariables().thenAsync(jsVariables -> {
-    //         var vars = new HashMap<String, Variable>();
-    //         var variables = debugInfo.variables();
-    //         var promises = new ArrayList<Promise<Void>>();
-    //         if (variables != null) {
-    //             var address = jsFrame.getLocation().getColumn();
-    //             address -= debugInfo.offset();
-    //             for (var range : variables.find(address)) {
-    //                 var propertiesPromise = jsVariables.get("$var" + range.index()).getValue().getProperties();
-    //                 promises.add(propertiesPromise
-    //                         .then(prop -> {
-    //                             var variable = prop.get("value");
-    //                             return variable != null ? variable.getValue() : null;
-    //                         })
-    //                         .thenAsync((JavaScriptValue value) -> {
-    //                             if (value != null) {
-    //                                 var repr = value.getSimpleRepresentation();
-    //                                 if (repr.endsWith("n")) {
-    //                                     repr = repr.substring(0, repr.length() - 1);
-    //                                 }
-    //                                 var longValue = Long.parseLong(repr);
-    //                                 var varValue = new WasmValueImpl(this, debugInfo,
-    //                                         range.variable().type().asFieldType(), jsFrame, longValue);
-    //                                 var variable = new Variable(range.variable().name(), varValue);
-    //                                 vars.put(variable.getName(), variable);
-    //                             }
-    //                             return Promise.VOID;
-    //                         })
-    //                 );
-    //             }
-    //         }
-    //         return Promise.allVoid(promises).then(x -> vars);
-    //     });
-    // }
+    Promise<Map<String, Variable>> createVariables(JavaScriptCallFrame jsFrame, DebugInfo debugInfo) {
+        return jsFrame.getVariables().thenAsync(jsVariables -> {
+            var vars = new HashMap<String, Variable>();
+            var variables = debugInfo.variables();
+            var promises = new ArrayList<Promise<Void>>();
+            if (variables != null) {
+                var address = jsFrame.getLocation().getColumn();
+                address -= debugInfo.offset();
+                for (var range : variables.find(address)) {
+                    var propertiesPromise = jsVariables.get("$var" + range.index()).getValue().getProperties();
+                    promises.add(propertiesPromise
+                            .then(prop -> {
+                                var variable = prop.get("value");
+                                return variable != null ? variable.getValue() : null;
+                            })
+                            .thenAsync((JavaScriptValue value) -> {
+                                if (value != null) {
+                                    var repr = value.getSimpleRepresentation();
+                                    if (repr.endsWith("n")) {
+                                        repr = repr.substring(0, repr.length() - 1);
+                                    }
+                                    var longValue = Long.parseLong(repr);
+                                    var varValue = new WasmValueImpl(this, debugInfo,
+                                            range.variable().type().asFieldType(), jsFrame, longValue);
+                                    var variable = new Variable(range.variable().name(), varValue);
+                                    vars.put(variable.getName(), variable);
+                                }
+                                return Promise.VOID;
+                            })
+                    );
+                }
+            }
+            return Promise.allVoid(promises).then(x -> vars);
+        });
+    }
 
     private void addScript(JavaScriptScript script) {
         Promise<Void> promise;
@@ -571,9 +571,9 @@ public class Debugger {
             case JS:
                 promise = addJavaScriptScript(script);
                 break;
-            // case WASM:
-            //     promise = addWasmScript(script);
-            //     break;
+            case WASM:
+                promise = addWasmScript(script);
+                break;
             default:
                 promise = Promise.VOID;
                 break;
@@ -600,48 +600,49 @@ public class Debugger {
         return Promise.VOID;
     }
 
-    // private Promise<Void> addWasmScript(JavaScriptScript script) {
-    //     return script.getSource().thenVoid(source -> {
-    //         if (source == null) {
-    //             return;
-    //         }
-    //         var decoder = Base64.getDecoder();
-    //         var reader = new ByteArrayAsyncInputStream(decoder.decode(source));
-    //         var parser = new DebugInfoParser(reader);
-    //         try {
-    //             reader.readFully(parser::parse);
-    //         } catch (Throwable e) {
-    //             e.printStackTrace();
-    //         }
-    //         var debugInfo = parser.getDebugInfo();
-    //         if (debugInfo != null) {
-    //             wasmDebugInfoMap.put(script, debugInfo);
-    //             wasmScriptMap.put(debugInfo, script);
-    //             if (debugInfo.lines() != null) {
-    //                 for (var sequence : debugInfo.lines().sequences()) {
-    //                     for (var command : sequence.commands()) {
-    //                         if (command instanceof LineInfoFileCommand) {
-    //                             var file = ((LineInfoFileCommand) command).file();
-    //                             if (file != null) {
-    //                                 addWasmInfoFile(file.fullName(), debugInfo);
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     });
-    // }
-
-    // private void addWasmInfoFile(String sourceFile, DebugInfo debugInfo) {
-    //     var list = wasmInfoFileMap.get(sourceFile);
-    //     if (list == null) {
-    //         list = new HashSet<>();
-    //         wasmInfoFileMap.put(sourceFile, list);
-    //     }
-    //     list.add(debugInfo);
-    //     allSourceFiles.add(sourceFile);
-    // }
+    private Promise<Void> addWasmScript(JavaScriptScript script) {
+        return script.getSource().thenVoid(source -> {
+            if (source == null) {
+                return;
+            }
+            var decoder = Base64.getDecoder();
+            var reader = new ByteArrayAsyncInputStream(decoder.decode(source));
+            // var parser = new DebugInfoParser(reader);
+            // try {
+            //     reader.readFully(parser::parse);
+            // } catch (Throwable e) {
+            //     e.printStackTrace();
+            // }
+            // var debugInfo = parser.getDebugInfo();
+            // if (debugInfo != null) {
+            //     wasmDebugInfoMap.put(script, debugInfo);
+            //     wasmScriptMap.put(debugInfo, script);
+            //     if (debugInfo.lines() != null) {
+            //         for (var sequence : debugInfo.lines().sequences()) {
+            //             for (var command : sequence.commands()) {
+            //                 if (command instanceof LineInfoFileCommand) {
+            //                     var file = ((LineInfoFileCommand) command).file();
+            //                     if (file != null) {
+            //                         addWasmInfoFile(file.fullName(), debugInfo);
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+            return ;
+        });
+    }
+ 
+    private void addWasmInfoFile(String sourceFile, DebugInfo debugInfo)  {
+        var list = wasmInfoFileMap.get(sourceFile);
+        if (list == null) {
+            list = new HashSet<>();
+            wasmInfoFileMap.put(sourceFile, list);
+        }
+        list.add(debugInfo);
+        allSourceFiles.add(sourceFile);
+    }
 
     public Set<? extends String> getScriptNames() {
         return scriptNames;
