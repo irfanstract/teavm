@@ -36,6 +36,7 @@ import org.teavm.model.MethodDescriptor;
 import org.teavm.model.MethodReader;
 import org.teavm.model.ReferenceCache;
 import org.teavm.model.ValueType;
+import org.teavm.runtime.reflect.ModifiersInfo;
 
 public class ClassIO {
     private static AccessLevel[] accessLevels = AccessLevel.values();
@@ -225,11 +226,13 @@ public class ClassIO {
                 MethodDescriptor.parse(symbolTable.at(input.readUnsigned())));
         method.reference = referenceCache.getCached(className, descriptor);
         method.level = accessLevels[input.readUnsigned()];
-        method.modifiers = unpackModifiers(input.readUnsigned());
+        var packedModifiers = input.readUnsigned();
+        method.modifiers = unpackModifiers(packedModifiers);
         method.annotations = annotationIO.readAnnotations(input);
         method.ownerName = className;
         method.name = descriptor.getName();
 
+        method.beingSignaturePolymorphic = (packedModifiers & ModifiersInfo.SIGNATUREPOLYMORPHIC) != 0 ;
         method.parameterAnnotations = new CachedAnnotations[descriptor.parameterCount()];
         for (int i = 0; i < method.parameterCount(); ++i) {
             method.parameterAnnotations[i] = annotationIO.readAnnotations(input);

@@ -15,6 +15,8 @@
  */
 package org.teavm.runtime.reflect;
 
+import org.objectweb.asm.Opcodes;
+
 public final class ModifiersInfo {
     private ModifiersInfo() {
     }
@@ -40,4 +42,21 @@ public final class ModifiersInfo {
     public static final int SYNTHETIC = 1 << 15;
     public static final int ENUM = 1 << 16;
     public static final int BRIDGE = 1 << 17;
+    @Deprecated
+    public static final int SIGNATUREPOLYMORPHIC = 1 << 19;
+
+    /**
+     * <p> does `access` signify signature polymorphic method?
+     * 
+     * <p> since ASM (`org.ow2:asm`) strips the signature-polymorphic modifier bit from method access flags, we also treat methods marked as both `native` and `varargs` as signature-polymorphic, as this is the only known combination of modifiers that can be used to mark a method as signature-polymorphic in bytecode, and is used by the JDK for `java.lang.invoke.MethodHandle.invokeExact` and `java.lang.invoke.MethodHandle.invoke` methods.
+     * 
+     */
+    public static boolean dictatesSignaturePolymorphism(int access) {
+        return (
+            (access & 0x00080000) != 0
+            ||
+            /* WORKAROUND */ ((access & Opcodes.ACC_NATIVE) != 0 && (access & Opcodes.ACC_VARARGS) != 0 )
+        ) ;
+    }
+
 }

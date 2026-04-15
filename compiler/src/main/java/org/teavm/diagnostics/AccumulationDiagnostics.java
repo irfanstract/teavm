@@ -18,25 +18,25 @@ package org.teavm.diagnostics;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.teavm.common.Sets;
+
 import org.teavm.model.CallLocation;
 
 public class AccumulationDiagnostics implements Diagnostics, ProblemProvider {
-    private List<Problem> problems = new ArrayList<>();
-    private List<Problem> readonlyProblems = Collections.unmodifiableList(problems);
-    private List<Problem> severeProblems = new ArrayList<>();
-    private List<Problem> readonlySevereProblems = Collections.unmodifiableList(severeProblems);
+    private List<Problem> readonlyProblems = List.of();
+    private List<Problem> readonlySevereProblems = List.of();
 
     @Override
     public void error(CallLocation location, String error, Object... params) {
-        Problem problem = new Problem(ProblemSeverity.ERROR, location, error, params);
-        problems.add(problem);
-        severeProblems.add(problem);
+        Problem newProblem = new Problem(ProblemSeverity.ERROR, location, error, params);
+        readonlyProblems = Sets.appended(readonlyProblems, newProblem);
+        readonlySevereProblems = Sets.appended(readonlySevereProblems, newProblem);
     }
 
     @Override
     public void warning(CallLocation location, String error, Object... params) {
-        Problem problem = new Problem(ProblemSeverity.WARNING, location, error, params);
-        problems.add(problem);
+        Problem newProblem = new Problem(ProblemSeverity.WARNING, location, error, params);
+        readonlyProblems = Sets.appended(readonlyProblems, newProblem);
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package org.teavm.cache;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -74,13 +75,38 @@ class CachedClassReader extends CachedElement implements ClassReader {
     }
 
     @Override
-    public MethodReader getMethod(MethodDescriptor method) {
+    public MethodReader getRawMethod(MethodDescriptor method) {
         return methods.get(method);
     }
 
+    // @Override
+    // public MethodReader getMethod(MethodDescriptor que) {
+    //     var result = (
+    //         methods.entrySet().stream()
+    //         .filter(met -> met.getKey().getName() == que.getName())
+    //         .map(e -> e.getValue())
+    //         .toList()
+    //     );
+    //     if (result.isEmpty()) {
+    //         return null;
+    //     }
+    //     if (1 < result.size()) {
+    //         return null;
+    //     }
+    //     {
+    //     var m = result.get(0) ;
+    //     if (m.isSignaturePolymorphic() ) {
+    //         // TODO
+    //         throw new Error(MessageFormat.format("searching {0} {1} got SP-y {2}", que.getName(), List.of(que.getParameterTypes()), List.of(m.getParameterTypes()) ) ) ;
+    //     } else {
+    //         return m ;
+    //     }
+    //     }
+    // }
+
     @Override
     public Collection<? extends MethodReader> getMethods() {
-        return methods.values();
+        return List.copyOf(methods.values());
     }
 
     @Override
@@ -90,7 +116,7 @@ class CachedClassReader extends CachedElement implements ClassReader {
 
     @Override
     public Collection<? extends FieldReader> getFields() {
-        return fields.values();
+        return List.copyOf(fields.values());
     }
 
     @Override

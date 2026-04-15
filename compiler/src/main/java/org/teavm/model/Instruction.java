@@ -164,4 +164,7 @@ public abstract class Instruction {
             throw new IllegalArgumentException("This instruction is in some basic block");
         }
     }
+
+    public FieldReference getField() { return null; }
+
 }

@@ -22,6 +22,8 @@ public interface MethodReader extends MemberReader {
 
     GenericValueType getGenericResultType();
 
+    boolean isSignaturePolymorphic();
+
     int parameterCount();
 
     ValueType[] getSignature();

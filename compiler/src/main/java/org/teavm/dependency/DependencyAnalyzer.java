@@ -67,6 +67,18 @@ import org.teavm.parsing.resource.ResourceProvider;
 import org.teavm.vm.spi.ClassFilter;
 import org.teavm.vm.spi.ClassFilterContext;
 
+/**
+ * <p> instances of this class are used to analyze dependencies of a program. The analyzer is used to determine which classes, methods, and fields are needed for the program, and to determine the order in which they should be compiled. The analyzer is also used to determine which classes, methods, and fields can be removed from the program, and to determine the order in which they should be removed. The analyzer is also used to determine which classes, methods, and fields can be optimized for the target platform, and to determine the order in which they should be optimized.
+ * 
+ * <p> occurs in {@link org.teavm.vm.TeaVMTarget#contributeDependencies(DependencyAnalyzer)}, and is used by the target to add dependencies that are not visible in the program, or that are not visible in the bytecode. This is used to add dependencies on classes and methods that are not referenced in the program, but are required for the target platform, or that are implemented in a different way on the target platform.
+ * 
+ * @apiNote
+ * 
+ * <p> subclassed by {@link org.teavm.dependency.DependencyAgent}, which is used by the compiler to analyze dependencies of the program, and to determine which classes, methods, and fields are needed for the program, and to determine the order in which they should be compiled. The agent is also used to determine which classes, methods, and fields can be removed from the program, and to determine the order in which they should be removed. The agent is also used to determine which classes, methods, and fields can be optimized for the target platform, and to determine the order in which they should be optimized.
+ * 
+ * <p> the analyzer is used by the compiler to determine the dependencies of the program, and to determine the order in which they should be compiled. The analyzer is also used by the target to determine which classes, methods, and fields are needed for the target platform, and to determine the order in which they should be compiled. The analyzer is also used by the target to determine which classes, methods, and fields can be removed from the program, and to determine the order in which they should be removed. The analyzer is also used by the target to determine which classes, methods, and fields can be optimized for the target platform, and to determine the order in which they should be optimized.
+ * 
+ */
 public abstract class DependencyAnalyzer implements DependencyInfo {
     private static final int PROPAGATION_STACK_THRESHOLD = 50;
     private static final MethodDescriptor CLINIT_METHOD = new MethodDescriptor("<clinit>", void.class);

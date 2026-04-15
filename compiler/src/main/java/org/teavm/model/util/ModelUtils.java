@@ -75,6 +75,7 @@ public final class ModelUtils {
         MethodHolder copy = new MethodHolder(method.getDescriptor());
         copy.setLevel(method.getLevel());
         copy.getModifiers().addAll(method.readModifiers());
+        copy.setBeingSignaturePolymorphic(method.isSignaturePolymorphic());
         copy.setTypeParameters(method.getTypeParameters());
         copy.setGenericSignature(method.getGenericResultType(), method.getGenericParameterTypes());
         if (method.getProgram() != null && withProgram) {

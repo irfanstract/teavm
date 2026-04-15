@@ -314,7 +314,7 @@ public class TeaVM implements TeaVMHost, ServiceRepository {
         dependencyAnalyzer.setEntryPoint(entryPoint);
         dependencyAnalyzer.addClassTransformer((c, context) -> {
             if (c.getName().equals(entryPoint)) {
-                var clinit = c.getMethod(CLINIT_DESC);
+                var clinit = c.getRawMethod(CLINIT_DESC);
                 if (clinit == null) {
                     clinit = new MethodHolder(CLINIT_DESC);
                     clinit.getModifiers().add(ElementModifier.STATIC);
@@ -598,7 +598,7 @@ public class TeaVM implements TeaVMHost, ServiceRepository {
             return;
         }
 
-        MethodHolder method = cls.getMethod(methodRef.getDescriptor());
+        MethodHolder method = cls.getRawMethod(methodRef.getDescriptor());
         if (method == null) {
             return;
         }
@@ -710,7 +710,7 @@ public class TeaVM implements TeaVMHost, ServiceRepository {
             if (cls == null) {
                 continue;
             }
-            MethodHolder method = cls.getMethod(methodReference.getDescriptor());
+            MethodHolder method = cls.getRawMethod(methodReference.getDescriptor());
             if (method == null) {
                 continue;
             }

@@ -25,7 +25,7 @@ public abstract class VirtualFileSystemProviderTransformer implements ClassHolde
     @Override
     public void transformClass(ClassHolder cls, ClassHolderTransformerContext context) {
         if (cls.getName().equals(VirtualFileSystemProvider.class.getName())) {
-            MethodHolder method = cls.getMethod(new MethodDescriptor("create", VirtualFileSystem.class));
+            MethodHolder method = cls.getRawMethod(new MethodDescriptor("create", VirtualFileSystem.class));
             transformCreateMethod(method, context);
         }
     }

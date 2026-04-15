@@ -191,6 +191,20 @@ public class ReferenceResolver {
         }
     };
 
+    private void emitFieldNotFoundError(Instruction instruction) {
+        reportError(instruction.getLocation(), "Field {{f0}} was not found", instruction.getField());
+        emitExceptionThrow(instruction.getLocation(), NoSuchFieldError.class.getName(),
+                "Field not found: " + instruction.getField());
+        truncateBlock(instruction);
+    }
+
+    private void emitMethodNotFoundError(InvokeInstruction instruction, MethodReference calledRef) {
+        reportError(instruction.getLocation(), "Method {{m0}} was not found", calledRef);
+        emitExceptionThrow(instruction.getLocation(), NoSuchMethodError.class.getName(),
+                "Method not found: " + instruction.getMethod());
+        truncateBlock(instruction);
+    }
+
     private boolean resolve(InvokeInstruction instruction) {
         var calledRef = instruction.getMethod();
 
@@ -208,10 +222,7 @@ public class ReferenceResolver {
     private boolean resolve(GetFieldInstruction instruction) {
         var resolvedField = resolve(instruction.getField());
         if (resolvedField == null) {
-            reportError(instruction.getLocation(), "Field {{f0}} was not found", instruction.getField());
-            emitExceptionThrow(instruction.getLocation(), NoSuchFieldError.class.getName(),
-                    "Field not found: " + instruction.getField());
-            truncateBlock(instruction);
+            emitFieldNotFoundError(instruction);
             return false;
         }
         instruction.setField(resolvedField.getReference());
@@ -221,10 +232,7 @@ public class ReferenceResolver {
     private boolean resolve(PutFieldInstruction instruction) {
         var resolvedField = resolve(instruction.getField());
         if (resolvedField == null) {
-            reportError(instruction.getLocation(), "Field {{f0}} was not found", instruction.getField());
-            emitExceptionThrow(instruction.getLocation(), NoSuchFieldError.class.getName(),
-                    "Field not found: " + instruction.getField());
-            truncateBlock(instruction);
+            emitFieldNotFoundError(instruction);
             return false;
         }
         instruction.setField(resolvedField.getReference());
@@ -234,10 +242,7 @@ public class ReferenceResolver {
     private boolean resolveSpecial(InvokeInstruction instruction, MethodReference calledRef) {
         var resolvedMethod = resolve(calledRef);
         if (resolvedMethod == null) {
-            reportError(instruction.getLocation(), "Method {{m0}} was not found", calledRef);
-            emitExceptionThrow(instruction.getLocation(), NoSuchMethodError.class.getName(),
-                    "Method not found: " + instruction.getMethod());
-            truncateBlock(instruction);
+            emitMethodNotFoundError(instruction, calledRef);
             return false;
         }
         if (!checkMethod(instruction, resolvedMethod.getReference())) {
@@ -251,10 +256,7 @@ public class ReferenceResolver {
     private boolean resolveVirtual(InvokeInstruction instruction, MethodReference calledRef) {
         var resolvedMethod = resolve(calledRef);
         if (resolvedMethod == null) {
-            reportError(instruction.getLocation(), "Method {{m0}} was not found", calledRef);
-            emitExceptionThrow(instruction.getLocation(), NoSuchMethodError.class.getName(),
-                    "Method not found: " + instruction.getMethod());
-            truncateBlock(instruction);
+            emitMethodNotFoundError(instruction, calledRef);
             return false;
         }
 

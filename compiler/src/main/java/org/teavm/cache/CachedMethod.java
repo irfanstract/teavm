@@ -15,6 +15,7 @@
  */
 package org.teavm.cache;
 
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.function.Supplier;
 import org.teavm.model.AnnotationContainerReader;
@@ -34,7 +35,7 @@ class CachedMethod extends CachedMember implements MethodReader {
     GenericValueType[] genericParameterTypes;
     CachedAnnotations[] parameterAnnotations;
     AnnotationValue annotationDefault;
-    WeakReference<ProgramReader> program;
+    Reference<ProgramReader> program;
     Supplier<ProgramReader> programSupplier;
 
     @Override
@@ -91,6 +92,11 @@ class CachedMethod extends CachedMember implements MethodReader {
     public AnnotationContainerReader[] getParameterAnnotations() {
         return parameterAnnotations.clone();
     }
+
+    boolean beingSignaturePolymorphic ;
+
+    @Override
+    public boolean isSignaturePolymorphic() { return beingSignaturePolymorphic ; }
 
     @Override
     public MethodDescriptor getDescriptor() {

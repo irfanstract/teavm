@@ -17,6 +17,9 @@ package org.teavm.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
+
+import org.teavm.common.Sets;
 
 /**
  * <p> specifies method name and signature. Signature is an array of types, where the last type is a return type, and the rest are parameter types. </p>
@@ -28,28 +31,37 @@ import java.util.Arrays;
  * TODO: consider turning this into `record`. thought about making such change, but {@link #MethodDescriptor(String, ValueType...) <code>signature</code> being varargs} got me backing off
  * 
  */
-public class MethodDescriptor implements Serializable {
-    private String name;
-    private ValueType[] signature;
-    private transient int hash;
+public record MethodDescriptor(String name, List<ValueType> paramTyps, ValueType retType) implements Serializable {
 
-    public MethodDescriptor(String name, ValueType... signature) {
-        if (signature.length < 1) {
-            throw new IllegalArgumentException("Signature must be at least 1 element length");
-        }
-        this.name = name;
-        this.signature = Arrays.copyOf(signature, signature.length);
+    public MethodDescriptor(String name, ValueType[] paramTyps, ValueType retType) {
+        this(name, List.of(paramTyps), retType );
     }
 
-    public MethodDescriptor(String name, Class<?>... signature) {
-        if (signature.length < 1) {
+    /**
+     * @deprecated please specify 'params' and 'return' separately.
+     */
+    @Deprecated
+    public MethodDescriptor(String name, List<ValueType> paramTypesAndReturnType) {
+        this(name, paramTypesAndReturnType.subList(0, paramTypesAndReturnType.size() + -1 ), paramTypesAndReturnType.get(paramTypesAndReturnType.size() + -1 ) );
+        if (paramTypesAndReturnType.size() < 1) {
             throw new IllegalArgumentException("Signature must be at least 1 element length");
         }
-        this.name = name;
-        this.signature = new ValueType[signature.length];
-        for (int i = 0; i < signature.length; ++i) {
-            this.signature[i] = ValueType.parse(signature[i]);
-        }
+    }
+
+    /**
+     * @deprecated please specify 'params' and 'return' separately.
+     */
+    @Deprecated
+    public MethodDescriptor(String name, ValueType... signature) {
+        this(name, List.of(signature));
+    }
+
+    /**
+     * @deprecated please specify 'params' and 'return' separately.
+     */
+    @Deprecated
+    public MethodDescriptor(String name, Class<?>... signature) {
+        this(name, List.of(signature).stream().map(ValueType::parse).toList() );
     }
 
     public String getName() {
@@ -57,26 +69,23 @@ public class MethodDescriptor implements Serializable {
     }
 
     public ValueType[] getSignature() {
-        return Arrays.copyOf(signature, signature.length);
+        return Sets.appended(paramTyps, retType).toArray(new ValueType[0]);
     }
 
     public ValueType[] getParameterTypes() {
-        return Arrays.copyOf(signature, signature.length - 1);
+        return paramTyps.toArray(new ValueType[0]);
     }
 
     public ValueType getResultType() {
-        return signature[signature.length - 1];
+        return retType;
     }
 
     public int parameterCount() {
-        return signature.length - 1;
+        return paramTyps.size();
     }
 
     public ValueType parameterType(int index) {
-        if (index >= signature.length - 1) {
-            throw new IndexOutOfBoundsException(index + "/" + (signature.length - 1));
-        }
-        return signature[index];
+        return paramTyps.get(index);
     }
 
     @Override
@@ -85,6 +94,8 @@ public class MethodDescriptor implements Serializable {
     }
 
     public String signatureToString() {
+        var signature = getSignature();
+
         StringBuilder sb = new StringBuilder();
         sb.append('(');
         for (int i = 0; i < signature.length - 1; ++i) {
@@ -148,9 +159,10 @@ public class MethodDescriptor implements Serializable {
 
     @Override
     public int hashCode() {
+        int hash = 0;
         if (hash == 0) {
             hash = name.hashCode();
-            for (ValueType param : signature) {
+            for (ValueType param : getSignature()) {
                 hash = 31 * hash + param.hashCode();
             }
             if (hash == 0) {
@@ -161,30 +173,4 @@ public class MethodDescriptor implements Serializable {
         return hash;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof MethodDescriptor)) {
-            return false;
-        }
-        MethodDescriptor that = (MethodDescriptor) obj;
-
-        if (signature.length != that.signature.length) {
-            return false;
-        }
-
-        if (!name.equals(that.name)) {
-            return false;
-        }
-
-        for (int i = 0; i < signature.length; ++i) {
-            if (!signature[i].equals(that.signature[i])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
 }

@@ -22,30 +22,46 @@ public interface ClassHolderSource extends ClassReaderSource {
     ClassHolder get(String name);
 
     default Stream<ClassHolder> getMutableAncestors(String name) {
-        return getAncestors(name).map(cls -> (ClassHolder) cls);
+        return getAncestors(name).map(this::onlyIfMutable ).filter(e -> e != null);
     }
 
     default Stream<ClassHolder> getMutableAncestorClasses(String name) {
-        return getAncestorClasses(name).map(cls -> (ClassHolder) cls);
+        return getAncestorClasses(name).map(this::onlyIfMutable ).filter(e -> e != null);
     }
 
     default MethodHolder resolveMutable(MethodReference method) {
-        return (MethodHolder) resolve(method);
+        return onlyIfMutable(resolve(method));
     }
 
     default MethodHolder resolveMutableImplementation(MethodReference method) {
-        return (MethodHolder) resolveImplementation(method);
+        return onlyIfMutable(resolveImplementation(method));
     }
 
     default MethodHolder resolveMutableImplementation(String className, MethodDescriptor descriptor) {
-        return (MethodHolder) resolveImplementation(className, descriptor);
+        return onlyIfMutable(resolveImplementation(className, descriptor) );
     }
 
     default FieldHolder resolveMutable(FieldReference field) {
-        return (FieldHolder) resolve(field);
+        return onlyIfMutable(resolve(field));
     }
 
     default Stream<MethodHolder> mutableOverriddenMethods(MethodReference method) {
-        return overriddenMethods(method).map(m -> (MethodHolder) m);
+        return overriddenMethods(method).map(this::onlyIfMutable ).filter(e -> e != null);
     }
+
+    private ClassHolder onlyIfMutable(ClassReader implementation) {
+        if (implementation instanceof ClassHolder m) { return m; }
+        else return null;
+    }
+
+    private MethodHolder onlyIfMutable(MethodReader implementation) {
+        if (implementation instanceof MethodHolder m) { return m; }
+        else return null;
+    }
+
+    private FieldHolder onlyIfMutable(FieldReader implementation) {
+        if (implementation instanceof FieldHolder m) { return m; }
+        else return null;
+    }
+
 }

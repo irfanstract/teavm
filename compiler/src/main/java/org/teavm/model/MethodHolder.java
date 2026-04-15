@@ -81,6 +81,15 @@ public class MethodHolder extends MemberHolder implements MethodReader {
         this.typeParameters = typeParameters != null ? typeParameters.clone() : null;
     }
 
+    private boolean beingSignaturePolymorphic ;
+
+    @Override
+    public boolean isSignaturePolymorphic() { return beingSignaturePolymorphic ; }
+
+    public void setBeingSignaturePolymorphic(boolean beingSignaturePolymorphic) {
+        this.beingSignaturePolymorphic = beingSignaturePolymorphic ;
+    }
+
     @Override
     public int parameterCount() {
         return descriptor.parameterCount();

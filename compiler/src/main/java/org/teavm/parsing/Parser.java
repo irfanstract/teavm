@@ -59,6 +59,7 @@ import org.teavm.model.util.DefinitionExtractor;
 import org.teavm.model.util.PhiUpdater;
 import org.teavm.model.util.ProgramNodeSplittingBackend;
 import org.teavm.model.util.ProgramUtils;
+import org.teavm.runtime.reflect.ModifiersInfo;
 
 public class Parser {
     private static final int DECL_CLASS = 0;
@@ -132,6 +133,8 @@ public class Parser {
         if (node.signature != null) {
             parseMethodGenericSignature(node.signature, method);
         }
+
+        parseSigPolymoAnnotation(method);
 
         return method;
     }
@@ -444,6 +447,29 @@ public class Parser {
         return field;
     }
 
+    /**
+     * conditionally call {@code m.setBeingSignaturePolymorphic} based on the annotations present, and possibly other things.
+     * 
+     * @apiNote
+     * these are:
+     * 
+     * - <code>@java.lang.invoke.MethodHandle$PolymorphicSignature</code>
+     */
+    private void parseSigPolymoAnnotation(MethodHolder m) {
+        if (m.getAnnotations().get("java.lang.invoke.MethodHandle$PolymorphicSignature") != null ) {
+            m.setBeingSignaturePolymorphic(true);
+        }
+    }
+
+    /**
+     * parses the signature-polymorphic modifier bit from method access flags (ie {@link ModifiersInfo#dictatesSignaturePolymorphism(int)}), and sets the corresponding property on the method if the bit is present.
+     */
+    private void parseSigPolymoBit(int access, MethodHolder member) {
+        if (ModifiersInfo.dictatesSignaturePolymorphism(access) ) {
+            member.setBeingSignaturePolymorphic(true);
+        }
+    }
+
     public void parseModifiers(int access, ElementHolder member, int type) {
         if ((access & Opcodes.ACC_PRIVATE) != 0) {
             member.setLevel(AccessLevel.PRIVATE);
@@ -511,8 +537,21 @@ public class Parser {
         if ((access & Opcodes.ACC_RECORD) != 0) {
             member.getModifiers().add(ElementModifier.RECORD);
         }
+
+        if (member instanceof MethodHolder m ) {
+            parseSigPolymoBit(access, m);
+        }
     }
 
+    /**
+     * 
+     * @apiNote
+     * 
+     * slash-character(s) will be replaced with dot-character(s) in annotation class names, as this is the format used by the rest of the compiler, and is more convenient to work with. for example, an annotation with descriptor `Lcom/example/MyAnnotation;` will be stored under the name `com.example.MyAnnotation`.
+     * 
+     * if the same annotation is present in both visible and invisible annotations, only one instance of it will be added to the container, and the values from the first occurrence will be used. for example, if an annotation `@MyAnnotation(value = 1)` is present in visible annotations, and `@MyAnnotation(value = 2)` is present in invisible annotations, only one instance of `@MyAnnotation` will be added to the container, and its value will be `1`.
+     * 
+     */
     private void parseAnnotations(AnnotationContainer annotations, List<AnnotationNode> visibleAnnotations,
             List<AnnotationNode> invisibleAnnotations) {
         List<Object> annotNodes = new ArrayList<>();

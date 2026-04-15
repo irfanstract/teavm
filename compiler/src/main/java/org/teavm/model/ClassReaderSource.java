@@ -19,6 +19,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -85,6 +86,17 @@ public interface ClassReaderSource {
                 }
             }
         }).spliterator(), false);
+    }
+
+    /**
+     * all methods with the same name, irrespective of their types.
+     * 
+     */
+    default List<? extends MethodReader> resolveAllOverloads(MethodReference method) {
+        return getAncestors(method.getClassName())
+                .map(cls -> cls.getMethods())
+                .flatMap(c -> c.stream() )
+                .toList();
     }
 
     default MethodReader resolve(MethodReference method) {

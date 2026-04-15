@@ -65,6 +65,7 @@ class DependencyClassSource implements ClassHolderSource {
     private ClassInitInsertion classInitInsertion;
     private String entryPoint;
     Map<MethodReference, BootstrapMethodSubstitutor> bootstrapMethodSubstitutors = new HashMap<>();
+    BootstrapMethodSubstitutor bsmDefaultSubst = null ;
     private boolean disposed;
     private Set<MethodReference> usedMethods = new HashSet<>();
     private Map<MethodReference, List<Runnable>> pendingErrors = new HashMap<>();
@@ -189,14 +190,14 @@ class DependencyClassSource implements ClassHolderSource {
                 InvokeDynamicInstruction indy = (InvokeDynamicInstruction) insn;
                 MethodReference bootstrapMethod = new MethodReference(indy.getBootstrapMethod().getClassName(),
                         indy.getBootstrapMethod().getName(), indy.getBootstrapMethod().signature());
-                BootstrapMethodSubstitutor substitutor = bootstrapMethodSubstitutors.get(bootstrapMethod);
+                BootstrapMethodSubstitutor substitutor = bootstrapMethodSubstitutors.getOrDefault(bootstrapMethod, bsmDefaultSubst);
                 if (substitutor == null) {
                     NullConstantInstruction nullInsn = new NullConstantInstruction();
                     nullInsn.setReceiver(indy.getReceiver());
                     nullInsn.setLocation(indy.getLocation());
                     insn.replace(nullInsn);
                     CallLocation location = new CallLocation(method.getReference(), insn.getLocation());
-                    reportError(location, "Bootstrap method {{m0}} was not found", bootstrapMethod);
+                    reportError(location, "no substitutor for Bootstrap Method {{m0}}", bootstrapMethod);
                     continue;
                 }
 

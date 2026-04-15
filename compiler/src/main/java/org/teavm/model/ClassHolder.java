@@ -72,7 +72,7 @@ public class ClassHolder extends ElementHolder implements ClassReader {
     }
 
     @Override
-    public MethodHolder getMethod(MethodDescriptor method) {
+    public MethodHolder getRawMethod(MethodDescriptor method) {
         return methods.get(method);
     }
 
@@ -164,4 +164,5 @@ public class ClassHolder extends ElementHolder implements ClassReader {
     public List<String> getInnerClasses() {
         return innerClasses;
     }
+
 }
