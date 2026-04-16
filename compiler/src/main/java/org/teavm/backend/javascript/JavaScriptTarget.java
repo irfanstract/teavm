@@ -113,6 +113,7 @@ import org.teavm.vm.TeaVM;
 import org.teavm.vm.TeaVMTarget;
 import org.teavm.vm.TeaVMTargetController;
 import org.teavm.vm.spi.RendererListener;
+import org.teavm.vm.spi.TeaVMHost;
 import org.teavm.vm.spi.TeaVMHostExtension;
 
 public class JavaScriptTarget implements TeaVMTarget, TeaVMJavaScriptHost {

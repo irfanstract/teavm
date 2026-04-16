@@ -77,8 +77,12 @@ public class ReferenceResolver {
     private boolean shouldStop;
 
     public ReferenceResolver(ClassReaderSource classSource, String[] platformTags, Diagnostics diagnostics) {
+        this(classSource, List.of(platformTags), diagnostics);
+    }
+
+    public ReferenceResolver(ClassReaderSource classSource, List<String> platformTags, Diagnostics diagnostics) {
         this.classSource = classSource;
-        this.platformTags.addAll(List.of(platformTags));
+        this.platformTags.addAll(platformTags);
         unreachableBlockEliminator = new UnreachableBasicBlockEliminator();
         this.diagnostics = diagnostics;
     }

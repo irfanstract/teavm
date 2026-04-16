@@ -48,8 +48,9 @@ public interface ClassReader extends ElementReader {
         var m = getSignaturePolymorphicMethod(que, s -> null ) ;
         if (m != null ) {
             // TODO
-            System.err.println(MessageFormat.format("searching {0} {1} got SP-y {2}", que.getName(), List.of(que.getParameterTypes()), List.of(m.getParameterTypes()) ) ) ;
-            // throw    new Error(MessageFormat.format("searching {0} {1} got SP-y {2}", que.getName(), List.of(que.getParameterTypes()), List.of(m.getParameterTypes()) ) ) ;
+            if (false) {
+                System.err.println(MessageFormat.format("searching {0} {1} got SP-y {2}", que.getName(), List.of(que.getParameterTypes()), List.of(m.getParameterTypes()) ) ) ;
+            }
             return InmemInstantiatedSpMethodView.wrap(m, que);
         }
         }

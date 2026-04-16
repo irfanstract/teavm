@@ -1,0 +1,120 @@
+{
+  "version": "2.0.0",
+  "inputs": [
+
+    {
+      "id": "arbitraryCommand",
+      "type": "promptString",
+      "description": "Enter the command to run (shell will interpret)",
+    },
+
+    // {
+    //   "id": "remoteRepoUrl",
+    //   "type": "promptString",
+    //   "default": "file:///K:/path/to/repo/ or URL",
+    //   "description": "the remote repo URL",
+    // },
+    // {
+    //   "id": "remoteRepoBranchName",
+    //   "type": "pickString",
+    //   "options": [
+    //     "main",
+    //     "master",
+    //   ],
+    //   "description": "the remote repo branch name",
+    // },
+    // {
+    //   "id": "commitName",
+    //   "type": "promptString",
+    //   "default": "FETCH_HEAD",
+    //   "description": "the commit ref",
+    // },
+
+    // {
+    //   "id": "bunShVersion",
+    //   "type": "promptString",
+    //   "default": "1.3.9",
+    //   "description": "Bun Version",
+    // },
+
+    {
+      "id": "subprojectId",
+      "type": "pickString",
+      "options": [
+        "avcTxcConvoToolkitProject",
+        "avcTxcCompilersSubTwoProject",
+        "avcTxcCompilersSubTwoProjectMain",
+      ],
+      "description": "The Sub-Project's ID",
+    },
+
+  ],
+  "tasks": [
+
+    {
+      "label": "Run arbitrary command",
+      "type": "shell",
+      "command": "${input:arbitraryCommand}",
+      "windows": {
+        "command": "cmd.exe",
+        "args": ["/c", "${input:arbitraryCommand}"]
+      },
+      "linux": {
+        "command": "/bin/sh",
+        "args": ["-c", "${input:arbitraryCommand}"]
+      },
+      "osx": {
+        "command": "/bin/sh",
+        "args": ["-c", "${input:arbitraryCommand}"]
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "echo": true,
+      },
+      "problemMatcher": [],
+    },
+
+    // // RUN GIT FETCH FROM...
+    // // git fetch --depth=1 file:///K:/Dev/FncPlEvl4S main
+    // {
+    //   "label": "[Meta] Run Git Fetch From...",
+    //   "type": "shell",
+    //   "command": "git",
+    //   "args": ["fetch", "--depth=3", "${input:remoteRepoUrl}", "${input:remoteRepoBranchName}"],
+    //   "presentation": {
+    //     "reveal": "always",
+    //     "panel": "shared",
+    //     "echo": true
+    //   },
+    //   "problemMatcher": [],
+    // },
+    // {
+    //   "label": "[Meta] Run GIT RESET SOFT",
+    //   "type": "shell",
+    //   "command": "git",
+    //   "args": ["reset", "--soft", "${input:commitName}"],
+    //   "presentation": {
+    //     "reveal": "always",
+    //     "panel": "shared",
+    //     "echo": true,
+    //   },
+    //   "problemMatcher": [],
+    // },
+
+    // // npx --yes --package=bun@1.3.8 -- bun --help
+    // {
+    //   "label": "[Meta] Run BUN HELP",
+    //   "type": "shell",
+    //   "command": "npx",
+    //   "args": ["--yes", "--package=bun@${input:bunShVersion}", "--", "bun", "--help"],
+    //   "presentation": {
+    //     "reveal": "always",
+    //     "panel": "shared",
+    //     "echo": true,
+    //   },
+    //   "problemMatcher": [],
+    // },
+
+  ],
+}

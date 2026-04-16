@@ -40,6 +40,7 @@ import org.teavm.cache.IncrementalDependencyRegistration;
 import org.teavm.callgraph.CallGraph;
 import org.teavm.common.CachedFunction;
 import org.teavm.common.ServiceRepository;
+import org.teavm.dependency.BootstrapMethodSubstitutor;
 import org.teavm.diagnostics.Diagnostics;
 import org.teavm.interop.PlatformMarker;
 import org.teavm.model.AnnotationReader;
@@ -164,15 +165,19 @@ public abstract class DependencyAnalyzer implements DependencyInfo {
     }
 
     public void setObfuscated(boolean obfuscated) {
-        classSource.obfuscated = obfuscated;
+        classSource.obfuscated_$eq(obfuscated);
     }
 
     public void setStrict(boolean strict) {
-        classSource.strict = strict;
+        classSource.strict_$eq(strict);
     }
 
     public void setAsyncSupported(boolean asyncSupported) {
         this.asyncSupported = asyncSupported;
+    }
+
+    public void setBootstrapMethodLastResortSubstitutor(BootstrapMethodSubstitutor substitutor) {
+        classSource.setBootstrapMethodSubstitutorDefault(substitutor);
     }
 
     public DependencyAgent getAgent() {
@@ -804,12 +809,12 @@ public abstract class DependencyAnalyzer implements DependencyInfo {
 
         classSource.dispose();
         agentClassSource = classSourcePacker.pack(classSource,
-                ClassClosureAnalyzer.build(classSource, new ArrayList<>(classSource.cache.keySet())));
+                ClassClosureAnalyzer.build(classSource, new ArrayList<>(classSource.cacheC().keySet())));
         if (classSource != agentClassSource) {
             classHierarchy = new ClassHierarchy(agentClassSource);
             generatedClassNames.addAll(classSource.getGeneratedClassNames());
         }
-        classSource.innerHierarchy = null;
+        classSource.innerHierarchy_$eq(null);
 
         classSource = null;
         methodReaderCache = null;
@@ -875,7 +880,7 @@ public abstract class DependencyAnalyzer implements DependencyInfo {
     }
 
     public void addBootstrapMethodSubstitutor(MethodReference method, BootstrapMethodSubstitutor substitutor) {
-        classSource.bootstrapMethodSubstitutors.put(method, substitutor);
+        classSource.addBootstrapMethodSubstitutor(method, substitutor);
     }
 
     public void addDependencyPlugin(MethodReference method, DependencyPlugin dependencyPlugin) {

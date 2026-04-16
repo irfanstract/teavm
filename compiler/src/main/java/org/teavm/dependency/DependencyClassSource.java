@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.IntStream;
+
 import org.teavm.cache.IncrementalDependencyRegistration;
 import org.teavm.diagnostics.Diagnostics;
 import org.teavm.model.BasicBlock;
@@ -50,7 +52,16 @@ import org.teavm.model.transformation.ClassInitInsertion;
 import org.teavm.model.util.BasicBlockSplitter;
 import org.teavm.model.util.ModelUtils;
 
-class DependencyClassSource implements ClassHolderSource {
+/**
+ * the renamed, original DependencyClassSource implementation (written in Java). no longer maintained, in favour of the current {@link DependencyClassSource} (written in Scala).
+ * 
+ * @deprecated use {@link DependencyClassSource} instead.
+ * 
+ * @see DependencyClassSource
+ * 
+ */
+@Deprecated
+class DependencyClassSource0 implements ClassHolderSource {
     private DependencyAgent agent;
     private ClassReaderSource innerSource;
     ClassHierarchy innerHierarchy;
@@ -64,13 +75,24 @@ class DependencyClassSource implements ClassHolderSource {
     private ReferenceResolver referenceResolver;
     private ClassInitInsertion classInitInsertion;
     private String entryPoint;
+    private
     Map<MethodReference, BootstrapMethodSubstitutor> bootstrapMethodSubstitutors = new HashMap<>();
+    private
     BootstrapMethodSubstitutor bsmDefaultSubst = null ;
+
+    public void addBootstrapMethodSubstitutor(MethodReference assignee, BootstrapMethodSubstitutor substitutor) {
+        bootstrapMethodSubstitutors.put(assignee, substitutor);
+    }
+
+    public void setBootstrapMethodSubstitutorDefault(BootstrapMethodSubstitutor s) {
+        bsmDefaultSubst = s;
+    }
+
     private boolean disposed;
     private Set<MethodReference> usedMethods = new HashSet<>();
     private Map<MethodReference, List<Runnable>> pendingErrors = new HashMap<>();
 
-    DependencyClassSource(DependencyAgent agent, ClassReaderSource innerSource, Diagnostics diagnostics,
+    DependencyClassSource0(DependencyAgent agent, ClassReaderSource innerSource, Diagnostics diagnostics,
             IncrementalDependencyRegistration dependencyRegistration, String[] platformTags) {
         this.agent = agent;
         this.innerSource = innerSource;
@@ -79,6 +101,22 @@ class DependencyClassSource implements ClassHolderSource {
         this.dependencyRegistration = dependencyRegistration;
         referenceResolver = new ReferenceResolver(this, platformTags, diagnostics);
         classInitInsertion = new ClassInitInsertion(this);
+    }
+
+    void obfuscated_$eq(boolean obfuscated) {
+        this.obfuscated = obfuscated;
+    }
+
+    void strict_$eq(boolean strict) {
+        this.strict = strict;
+    }
+
+    void innerHierarchy_$eq(ClassHierarchy innerHierarchy) {
+        this.innerHierarchy = innerHierarchy;
+    }
+
+    Map<String, ? > cacheC() {
+        return Map.copyOf(cache);
     }
 
     public ReferenceResolver getReferenceResolver() {
@@ -101,7 +139,7 @@ class DependencyClassSource implements ClassHolderSource {
 
     public void submit(ClassHolder cls) {
         if (innerSource.get(cls.getName()) != null || generatedClasses.containsKey(cls.getName())) {
-            throw new IllegalArgumentException("Class " + cls.getName() + " is already defined");
+            throw new IllegalArgumentException(String.format("Class %s is already defined", cls.getName()));
         }
         if (!transformers.isEmpty()) {
             cls = ModelUtils.copyClass(cls);
@@ -179,7 +217,7 @@ class DependencyClassSource implements ClassHolderSource {
 
         ProgramEmitter pe = ProgramEmitter.create(program, innerHierarchy);
         BasicBlockSplitter splitter = new BasicBlockSplitter(program);
-        for (int i = 0; i < program.basicBlockCount(); ++i) {
+        for (var i : IntStream.range(0, program.basicBlockCount() ).toArray() ) {
             BasicBlock block = program.basicBlockAt(i);
             for (Instruction insn : block) {
                 if (!(insn instanceof InvokeDynamicInstruction)) {
@@ -208,7 +246,7 @@ class DependencyClassSource implements ClassHolderSource {
                 insn.delete();
 
                 List<ValueEmitter> arguments = new ArrayList<>();
-                for (int k = 0; k < indy.getArguments().size(); ++k) {
+                for (var k : IntStream.range(0, indy.getArguments().size() ).toArray() ) {
                     arguments.add(pe.var(indy.getArguments().get(k), indy.getMethod().parameterType(k)));
                 }
                 DynamicCallSite callSite = new DynamicCallSite(
@@ -279,7 +317,7 @@ class DependencyClassSource implements ClassHolderSource {
 
         @Override
         public void submit(ClassHolder cls) {
-            DependencyClassSource.this.submit(cls);
+            DependencyClassSource0.this.submit(cls);
         }
 
         @Override

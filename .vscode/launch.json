@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "scala",
+      "request": "launch",
+      "name": "[avcfw.fncpl.J2W.Live] M1",
+      "mainClass": "avcfw.fncpl.J2W.Live.xm1",
+      // "buildTarget": "file:/K:/Dev/FncPlEvl4S/#avcTxcCompilersSubTwoProjectMain/Compile",
+      "args": [
+        // "--",
+        "run",
+        "--version=1.0",
+        "--simulate-mobile=A",
+        "--synchronous",
+        // "com/sun/imageio/plugins/gif/GIFImageWriter",
+        // "javax/imageio/ImageIO",
+        "java/util/concurrent/ConcurrentMap",
+        "--version=2",
+        "--simulate-mobile",
+      ],
+      "jvmOptions": [
+        // /* https://stackoverflow.com/questions/71685564/native-library-loads-but-calling-native-function-throws-unsatisfiedlinkerror */
+        // "-Xlog:library=info",
+        "--enable-native-access=ALL-UNNAMED",
+      ],
+      "env": {},
+    },
+    {
+      "type": "scala",
+      "request": "launch",
+      "name": "jLineTerminalShowcase",
+      "mainClass": "avcfw.fncpl.CcSubTwoPkgInternal.jLineTerminalShowcase",
+      // "buildTarget": "file:/K:/Dev/FncPl2603/#avcTxcCompilersSubTwoProjectMain/Compile",
+      "args": [
+      ],
+      "jvmOptions": [
+        // /* https://stackoverflow.com/questions/71685564/native-library-loads-but-calling-native-function-throws-unsatisfiedlinkerror */
+        // "-Xlog:library=info",
+        "--enable-native-access=ALL-UNNAMED",
+      ],
+      // "env": {}
+      "envFile": ".env.local",
+    },
+  ],
+}

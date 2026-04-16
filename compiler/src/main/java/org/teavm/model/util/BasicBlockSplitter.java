@@ -68,11 +68,11 @@ public class BasicBlockSplitter {
         initIfNecessary();
 
         if (afterInstruction != null && afterInstruction.getBasicBlock() != block) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("[BasicBlockSplitter E005] Instruction does not belong to the block");
         }
 
         if (isLastInSequence.get(block.getIndex()) == 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("[BasicBlockSplitter E006] Block is already split");
         }
 
         BasicBlock splitBlock = program.createBasicBlock();
