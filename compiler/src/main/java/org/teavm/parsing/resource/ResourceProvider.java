@@ -60,4 +60,17 @@ public interface ResourceProvider extends AutoCloseable {
         public void close() {
         }
     };
+
+    static ResourceProvider fromFunction(scala.Function1<String, Iterator<Resource> > implLoad ) {
+    return new ResourceProvider() {
+        @Override
+        public Iterator<Resource> getResources(String name) {
+            return implLoad.apply(name);
+        }
+
+        @Override
+        public void close() {
+        }
+    };
+    }
 }

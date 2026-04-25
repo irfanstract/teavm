@@ -100,6 +100,7 @@ import org.teavm.model.util.ModelUtils;
 import org.teavm.model.util.ProgramUtils;
 import org.teavm.model.util.RegisterAllocator;
 import org.teavm.parsing.resource.ResourceProvider;
+import org.teavm.vm.TeaVMLinkerDefaults;
 import org.teavm.vm.spi.ClassFilter;
 import org.teavm.vm.spi.TeaVMHost;
 import org.teavm.vm.spi.TeaVMHostExtension;
@@ -721,7 +722,7 @@ public class TeaVM implements TeaVMHost, ServiceRepository {
                     method.setProgram(null);
                 } else {
                     Program program = method.getProgram();
-                    var context = new MethodOptimizationContextImpl(method);
+                    var context = new TeaVMLinkerDefaults.GeneralisedMethodOptimizationContextImpl(method, dependencyAnalyzer);
                     inlining.apply(program, method.getReference());
                     new UnusedVariableElimination().optimize(context, program);
                 }
@@ -769,98 +770,7 @@ public class TeaVM implements TeaVMHost, ServiceRepository {
     }
 
     private Program optimizeMethodCacheMiss(MethodHolder method, Program optimizedProgram) {
-        target.beforeOptimizations(optimizedProgram, method);
-
-        if (optimizedProgram.basicBlockCount() > 0) {
-            var context = new MethodOptimizationContextImpl(method);
-            boolean changed;
-            do {
-                changed = false;
-                for (MethodOptimization optimization : getOptimizations()) {
-                    try {
-                        changed |= optimization.optimize(context, optimizedProgram);
-                    } catch (Exception | AssertionError e) {
-                        ListingBuilder listingBuilder = new ListingBuilder();
-                        try {
-                            String listing = listingBuilder.buildListing(optimizedProgram, "");
-                            System.err.println("Error optimizing program for method " + method.getReference()
-                                    + ":\n" + listing);
-                        } catch (RuntimeException e2) {
-                            System.err.println("Error optimizing program for method " + method.getReference());
-                            // do nothing
-                        }
-                        throw new RuntimeException(e);
-                    }
-                }
-            } while (changed);
-
-            target.afterOptimizations(optimizedProgram, method);
-            var categoryProvider = target.variableCategoryProvider();
-            if (categoryProvider != null) {
-                var allocator = new RegisterAllocator(categoryProvider);
-                allocator.allocateRegisters(method.getReference(), optimizedProgram,
-                        optimizationLevel == TeaVMOptimizationLevel.SIMPLE);
-            }
-        }
-
-        return optimizedProgram;
-    }
-
-    class MethodOptimizationContextImpl implements MethodOptimizationContext {
-        private MethodReader method;
-
-        MethodOptimizationContextImpl(MethodReader method) {
-            this.method = method;
-        }
-
-        @Override
-        public MethodReader getMethod() {
-            return method;
-        }
-
-        @Override
-        public DependencyInfo getDependencyInfo() {
-            return dependencyAnalyzer;
-        }
-
-        @Override
-        public ClassReaderSource getClassSource() {
-            return dependencyAnalyzer.getClassSource();
-        }
-
-        @Override
-        public ClassHierarchy getHierarchy() {
-            return dependencyAnalyzer.getClassHierarchy();
-        }
-    }
-
-    private List<MethodOptimization> getOptimizations() {
-        List<MethodOptimization> optimizations = new ArrayList<>();
-        optimizations.add(new RedundantJumpElimination());
-        optimizations.add(new ArrayUnwrapMotion());
-        if (optimizationLevel.ordinal() >= TeaVMOptimizationLevel.ADVANCED.ordinal()) {
-            optimizations.add(new ScalarReplacement());
-            //optimizations.add(new LoopInversion());
-            optimizations.add(new LoopInvariantMotion());
-        }
-        if (optimizationLevel.ordinal() >= TeaVMOptimizationLevel.ADVANCED.ordinal()) {
-            optimizations.add(new RepeatedFieldReadElimination());
-        }
-        optimizations.add(new GlobalValueNumbering(optimizationLevel == TeaVMOptimizationLevel.SIMPLE));
-        optimizations.add(new RedundantNullCheckElimination());
-        if (optimizationLevel.ordinal() >= TeaVMOptimizationLevel.ADVANCED.ordinal()) {
-            optimizations.add(new ConstantConditionElimination());
-            optimizations.add(new RedundantJumpElimination());
-            optimizations.add(new UnusedVariableElimination());
-        }
-        optimizations.add(new ClassInitElimination());
-        optimizations.add(new UnreachableBasicBlockElimination());
-        optimizations.add(new UnusedVariableElimination());
-        if (target.needsSystemArrayCopyOptimization()) {
-            optimizations.add(new SystemArrayCopyOptimization());
-        }
-        optimizations.add(new RedundantPhiElimination());
-        return optimizations;
+        return TeaVMLinkerDefaults.optimizeMethodImpl(target, optimizationLevel, dependencyAnalyzer, method, optimizedProgram);
     }
 
     public void build(File dir, String fileName) {

@@ -27,6 +27,13 @@ public class AsyncMethodNode extends MethodNode {
         super(reference);
     }
 
+    /**
+     * note:
+     * despite the naming(s),
+     * this is not totally about JS being enforced to be single-threaded.
+     * this is also about TeaVM lacking CFR functionality (which packages like CFR/FernFlower have).
+     * 
+     */
     public List<AsyncMethodPart> getBody() {
         return body;
     }

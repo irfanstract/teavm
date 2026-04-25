@@ -18,6 +18,7 @@ package org.teavm.classlib.java.lang;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import org.teavm.classlib.impl.ExtensionPhase;
+import org.teavm.classlib.java.lang.invoke.TIntrinsics;
 // import org.teavm.classlib.PlatformDetector;
 // import org.teavm.backend.wasm.runtime.gc.WasmGCSupport;
 // import org.teavm.dependency.PluggableDependency;
@@ -25,8 +26,8 @@ import org.teavm.classlib.impl.ExtensionPhase;
 // import org.teavm.interop.Async;
 // import org.teavm.interop.AsyncCallback;
 // import org.teavm.interop.DelegateTo;
-// import org.teavm.interop.NoSideEffects;
-// import org.teavm.interop.Rename;
+import org.teavm.interop.NoSideEffects;
+import org.teavm.interop.Rename;
 // import org.teavm.interop.Structure;
 // import org.teavm.interop.Superclass;
 // import org.teavm.interop.Unmanaged;
@@ -42,7 +43,66 @@ import org.teavm.classlib.impl.ExtensionPhase;
 // import org.teavm.runtime.reflect.ClassInfo;
 
 @org.teavm.classlib.implAnnotation.ExtensionPhase(ExtensionPhase.COMPLEMENTING )
-class TObject {
+public class TObject {
+
+    @Rename("getClass")
+    final Class<?> getClass0() {
+        return TIntrinsics.apply();
+    }
+
+    @Override
+    public int hashCode() {
+        return identity();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "@" + Integer.toHexString(identity());
+    }
+
+    private String obfuscatedToString() {
+        return "<java_object>@" + Integer.toHexString(identity());
+    }
+
+    final int identity() {
+        return TIntrinsics.apply();
+    }
+
+    @Rename("clone")
+    private native TObject cloneObject();
+
+    @Rename("notify")
+    public final void notify0() {
+        TIntrinsics.apply();
+    }
+
+    @Rename("notifyAll")
+    public final void notifyAll0() {
+        TIntrinsics.apply();
+    }
+
+    @Rename("wait")
+    public final void wait0(long timeout) throws TInterruptedException {
+        try {
+            wait(timeout, 0);
+        } catch (InterruptedException ex) {
+            throw new TInterruptedException();
+        }
+    }
+
+    @Rename("wait")
+    private void wait0(long timeout, int nanos) throws TInterruptedException {
+        TIntrinsics.apply();
+    }
+
+    @Rename("wait")
+    final void wait0() throws InterruptedException {
+        try {
+            wait(0L);
+        } catch (InterruptedException ex) {
+            throw ex;
+        }
+    }
 
 }
 

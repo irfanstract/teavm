@@ -14,21 +14,21 @@ import org.teavm.vm.spi.TeaVMHost;
 public class CommonIndySubstSetup {
     private CommonIndySubstSetup() {}
 
-    public static void applyTo(DependencyAnalyzer d) {
+    public static void applyTo(TeaVMHost d) {
 
         LambdaMetafactorySubstitutor lms = new LambdaMetafactorySubstitutor();
-        d.addBootstrapMethodSubstitutor(new MethodReference("java.lang.invoke.LambdaMetafactory", "metafactory",
+        d.add(new MethodReference("java.lang.invoke.LambdaMetafactory", "metafactory",
                 ValueType.object("java.lang.invoke.MethodHandles$Lookup"), ValueType.object("java.lang.String"),
                 ValueType.object("java.lang.invoke.MethodType"), ValueType.object("java.lang.invoke.MethodType"),
                 ValueType.object("java.lang.invoke.MethodHandle"), ValueType.object("java.lang.invoke.MethodType"),
                 ValueType.object("java.lang.invoke.CallSite")), lms);
-        d.addBootstrapMethodSubstitutor(new MethodReference("java.lang.invoke.LambdaMetafactory", "altMetafactory",
+        d.add(new MethodReference("java.lang.invoke.LambdaMetafactory", "altMetafactory",
                 ValueType.object("java.lang.invoke.MethodHandles$Lookup"),
                 ValueType.object("java.lang.String"), ValueType.object("java.lang.invoke.MethodType"),
                 ValueType.arrayOf(ValueType.object("java.lang.Object")),
                 ValueType.object("java.lang.invoke.CallSite")), lms);
 
-        d.addBootstrapMethodSubstitutor(new MethodReference("java.lang.runtime.ObjectMethods", "bootstrap",
+        d.add(new MethodReference("java.lang.runtime.ObjectMethods", "bootstrap",
                 ValueType.object("java.lang.invoke.MethodHandles$Lookup"), ValueType.object("java.lang.String"),
                 ValueType.object("java.lang.invoke.TypeDescriptor"), ValueType.object("java.lang.Class"),
                 ValueType.object("java.lang.String"),
@@ -37,11 +37,11 @@ public class CommonIndySubstSetup {
                 new ObjectMethodsSubstitutor());
 
         StringConcatFactorySubstitutor stringConcatSubstitutor = new StringConcatFactorySubstitutor();
-        d.addBootstrapMethodSubstitutor(new MethodReference("java.lang.invoke.StringConcatFactory", "makeConcat",
+        d.add(new MethodReference("java.lang.invoke.StringConcatFactory", "makeConcat",
                 ValueType.object("java.lang.invoke.MethodHandles$Lookup"), ValueType.object("java.lang.String"),
                 ValueType.object("java.lang.invoke.MethodType"), ValueType.object("java.lang.invoke.CallSite")),
                 stringConcatSubstitutor);
-        d.addBootstrapMethodSubstitutor(new MethodReference("java.lang.invoke.StringConcatFactory", "makeConcatWithConstants",
+        d.add(new MethodReference("java.lang.invoke.StringConcatFactory", "makeConcatWithConstants",
                         ValueType.object("java.lang.invoke.MethodHandles$Lookup"), ValueType.object("java.lang.String"),
                         ValueType.object("java.lang.invoke.MethodType"), ValueType.object("java.lang.String"),
                         ValueType.arrayOf(ValueType.object("java.lang.Object")),
@@ -49,14 +49,14 @@ public class CommonIndySubstSetup {
                 stringConcatSubstitutor);
 
         SwitchBootstrapSubstitutor switchBootstrapSubstitutor = new SwitchBootstrapSubstitutor();
-        d.addBootstrapMethodSubstitutor(new MethodReference("java.lang.runtime.SwitchBootstraps", "typeSwitch",
+        d.add(new MethodReference("java.lang.runtime.SwitchBootstraps", "typeSwitch",
                         ValueType.object("java.lang.invoke.MethodHandles$Lookup"),
                         ValueType.object("java.lang.String"),
                         ValueType.object("java.lang.invoke.MethodType"),
                         ValueType.arrayOf(ValueType.object("java.lang.Object")),
                         ValueType.object("java.lang.invoke.CallSite")),
                 switchBootstrapSubstitutor);
-        d.addBootstrapMethodSubstitutor(new MethodReference("java.lang.runtime.SwitchBootstraps", "enumSwitch",
+        d.add(new MethodReference("java.lang.runtime.SwitchBootstraps", "enumSwitch",
                         ValueType.object("java.lang.invoke.MethodHandles$Lookup"),
                         ValueType.object("java.lang.String"),
                         ValueType.object("java.lang.invoke.MethodType"),

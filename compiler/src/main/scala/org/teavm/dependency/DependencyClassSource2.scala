@@ -181,7 +181,34 @@ class DependencyClassSource(
     def setEntryPoint(entryPoint: String): Unit =
         this.entryPoint = entryPoint
 
+    /**
+     * prints the listing of all classes in the cache, grouped by package, to the standard error stream.
+     * For each package, it prints the number of classes in that package and the list of class names (without the package prefix) in that package.
+     * This is useful for debugging purposes to see which classes are being loaded and transformed.
+     * 
+     */
+    def dumpListing(): Unit =
+        locally :
+            val pkgs =
+                cache
+                .groupBy({ case (k, v) => k.pipe { _.split("\\.").toSeq }.dropRight(1).mkString(".") })
+                .map { case (k, v) => (k, (n = v.size, items = for { v1 <- v.keySet } yield v1.pipe { _.split("\\.").toSeq }.last )) }
+                .toSeq
+                .sortBy { case (k, v) => k }
+            for { (pkg, pkgInf) <- pkgs } do
+                System.err.println { s"package ${pkg}: ${pkgInf.n}" }
+                if pkg matches "java\\.(lang|util)" then
+                    System.err.println :
+                        pkgInf.items
+                        .toSeq
+                        .sorted
+                        .mkString(", ")
+                        .indent(2)
+
     def dispose(): Unit =
+      locally :
+        dumpListing()
+      locally :
         transformers = Seq()
         bootstrapMethodSubstitutors = Map()
         disposed = true

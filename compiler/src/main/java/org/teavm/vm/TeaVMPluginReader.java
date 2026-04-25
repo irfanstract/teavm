@@ -38,6 +38,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
 // import org.teavm.metaprogramming.CompileTime;
 import org.teavm.parsing.AsmUtil;
+import org.teavm.vm.TeaVMPluginSysUtil;
 import org.teavm.vm.spi.After;
 import org.teavm.vm.spi.Before;
 import org.teavm.vm.spi.Requires;
@@ -54,18 +55,25 @@ final class TeaVMPluginReader {
 
     static void load(ClassLoader classLoader, Consumer<String> consumer) {
         Set<String> unorderedPlugins = new HashSet<>();
+        // try {
+        //     var resourceFiles = classLoader.getResources(DESCRIPTOR_LOCATION);
+        //     while (resourceFiles.hasMoreElements()) {
+        //         URL resourceFile = resourceFiles.nextElement();
+        //         try (var input = new BufferedReader(
+        //                 new InputStreamReader(resourceFile.openStream(), StandardCharsets.UTF_8))) {
+        //             readPlugins(input, unorderedPlugins);
+        //         }
+        //     }
+        // } catch (IOException e) {
+        //     throw new IllegalStateException("Error loading plugins", e);
+        // }
+        TeaVMPluginSysUtil.loadTextResource(classLoader, DESCRIPTOR_LOCATION, (input) -> {
         try {
-            var resourceFiles = classLoader.getResources(DESCRIPTOR_LOCATION);
-            while (resourceFiles.hasMoreElements()) {
-                URL resourceFile = resourceFiles.nextElement();
-                try (var input = new BufferedReader(
-                        new InputStreamReader(resourceFile.openStream(), StandardCharsets.UTF_8))) {
                     readPlugins(input, unorderedPlugins);
-                }
-            }
         } catch (IOException e) {
             throw new IllegalStateException("Error loading plugins", e);
         }
+        } );
 
         orderPlugins(classLoader, unorderedPlugins).forEach(consumer);
     }
@@ -76,7 +84,7 @@ final class TeaVMPluginReader {
             for (String className : classNames) {
                 PluginDescriptor descriptor = new PluginDescriptor();
                 descriptor.name = className;
-                if (readDescriptor(classLoader, className, descriptor)) {
+                if (loadClassFileAndReadDescriptiveAnnotations(classLoader, className, descriptor)) {
                     descriptors.put(className, descriptor);
                 }
             }
@@ -97,29 +105,30 @@ final class TeaVMPluginReader {
     }
 
     static void readPlugins(BufferedReader input, Set<String> plugins) throws IOException {
-        while (true) {
-            String line = input.readLine();
-            if (line == null) {
-                break;
-            }
-            line = line.trim();
-            if (line.isEmpty() || line.startsWith("#")) {
-                continue;
-            }
-
-            plugins.add(line);
-        }
+        TeaVMPluginListFile.readLineByLineIntoSet(input, plugins);
     }
 
-    private static boolean readDescriptor(ClassLoader classLoader, String className, PluginDescriptor descriptor)
+    /** */
+    private static boolean loadClassFileAndReadDescriptiveAnnotations(ClassLoader classLoader, String className, PluginDescriptor descriptor)
             throws IOException {
         try (InputStream input = classLoader.getResourceAsStream(className.replace('.', '/') + ".class")) {
+            // If the class cannot be found, we just skip it, without throwing an exception, because it might be a plugin that is not present in the current classpath, and we want to be able to work with such plugins (e.g. by skipping them and printing a warning, or by using some default behavior for them).
             if (input == null) {
                 return false;
             }
+            else { }
+            // System.err.println(String.format("loading plugin %s from %s", className, input) );
+            /**
+             * read the plugin descriptor from the class file, without loading the class, because loading the class can cause various issues (e.g. if the plugin class depends on some other class that is not present in the current classpath, or if the plugin class has some static initializer that throws an exception), and we want to be able to read the plugin descriptor and determine whether the plugin is reachable or not, even if the plugin class cannot be loaded. By reading the class file directly, we can avoid these issues and still read the plugin descriptor.
+             * 
+             * Note that we read the class file directly, instead of using reflection, because we want to be able to read the plugin descriptor even if the plugin class cannot be loaded (e.g. because it depends on some other class that is not present in the current classpath), and using reflection would throw an exception in such cases. By reading the class file directly, we can still read the plugin descriptor and determine whether the plugin is reachable or not, even if the plugin class cannot be loaded.
+             * 
+             */
+            {
             ClassReader reader = new ClassReader(new BufferedInputStream(input));
-            PluginDescriptorFiller filler = new PluginDescriptorFiller(descriptor);
+            var filler = new PluginDescInitAsClassVisitor(descriptor);
             reader.accept(filler, 0);
+            }
             return true;
         }
     }
@@ -202,10 +211,10 @@ final class TeaVMPluginReader {
         list.add(descriptor.name);
     }
 
-    static class PluginDescriptorFiller extends ClassVisitor {
+    static class PluginDescInitAsClassVisitor extends ClassVisitor {
         PluginDescriptor descriptor;
 
-        PluginDescriptorFiller(PluginDescriptor descriptor) {
+        PluginDescInitAsClassVisitor(PluginDescriptor descriptor) {
             super(AsmUtil.API_VERSION);
             this.descriptor = descriptor;
         }

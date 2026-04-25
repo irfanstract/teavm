@@ -44,6 +44,22 @@ lazy val avcTxcExtLibsLhyFastparseV03
   .settings(scalacOptions += "-explain" )
   .settings(scalacOptions += "-explain-cyclic" )
 
+lazy val avcTxcExtLibsLhyPPrintLib
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (extLibsParentDir / "ComLihaoyiPPrint" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = false )
+  .settings(libraryDependencies += "com.lihaoyi" %%% "pprint" % "0.9.6")
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+
 lazy val avcTxcExtLibsIltotoreIronV03
 =
   (
@@ -57,6 +73,22 @@ lazy val avcTxcExtLibsIltotoreIronV03
   )
   .asLeafProjectWithNecessarySettings(skipPlatforms = false )
   .settings(libraryDependencies += ("io.github.iltotore" %%% "iron" % "3.2.1" ) )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+
+lazy val avcComFasterXmlJacksonAnnotsLibsV2
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (extLibsParentDir / "ComFasterXmlJacksonLibsV2" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .settings(libraryDependencies += ("com.fasterxml.jackson.core" % "jackson-annotations" % "2.18.2" ))
+  .settings(libraryDependencies += ("com.fasterxml.jackson.core" % "jackson-databind"    % "2.18.2" ))
   .settings(scalacOptions += "-explain" )
   .settings(scalacOptions += "-explain-cyclic" )
 
@@ -339,6 +371,28 @@ lazy val tvmCommonsProject
   // .settings(scalacOptions += "-Xcheck-macros" )
   .settings(libraryDependencies += ("com.carrotsearch" % "hppc" % "0.8.1" ))
 
+lazy val tvmNativeCommonsProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "nativeCore" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+  .dependsOn(tvmCommonsProject )
+  .settings(libraryDependencies += ("com.carrotsearch" % "hppc" % "0.8.1" ))
+
 lazy val tvmInteropCoreProject
 =
   (
@@ -359,6 +413,103 @@ lazy val tvmInteropCoreProject
   .settings(scalacOptions += "-explain-cyclic" )
   // .settings(scalacOptions += "-Xcheck-macros" )
 
+lazy val tvmJvmAstProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "jvmAstLib" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmCommonsProject )
+  .dependsOn(tvmInteropCoreProject )
+  .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
+lazy val tvmRhinoJsEngineProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "rhinoJs" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .settings(libraryDependencies += ("org.mozilla" % "rhino" % "1.8.1" ))
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
+lazy val tvmCompilerUtilProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerUtil" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmCommonsProject )
+  .dependsOn(tvmInteropCoreProject )
+  .dependsOn(tvmJvmAstProject )
+  .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
+lazy val tvmCompilerIrAstProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerIrAst" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmCommonsProject )
+  .dependsOn(tvmCompilerUtilProject )
+  .dependsOn(tvmInteropCoreProject )
+  .dependsOn(tvmJvmAstProject )
+  .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+  .dependsOn(avcComFasterXmlJacksonAnnotsLibsV2 )
+  .dependsOn(tvmRhinoJsEngineProject)
+
+// lazy val tvmCompilerOptimProject
+
 lazy val tvmCompilerProject
 =
   (
@@ -372,8 +523,11 @@ lazy val tvmCompilerProject
   )
   .asLeafProjectWithNecessarySettings(skipPlatforms = true )
   .dependsOn(tvmCommonsProject )
+  .dependsOn(tvmCompilerUtilProject )
   .dependsOn(tvmInteropCoreProject )
+  .dependsOn(tvmJvmAstProject )
   .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  .dependsOn(tvmCompilerIrAstProject )
   // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
   .settings(scalaVersion := suggestedScala3Dot07VersionV)
   .settings(scalacOptions ++= Seq("-source", "3.7") )
@@ -381,9 +535,8 @@ lazy val tvmCompilerProject
   .settings(scalacOptions += "-explain" )
   .settings(scalacOptions += "-explain-cyclic" )
   // .settings(scalacOptions += "-Xcheck-macros" )
-  .settings(libraryDependencies += ("com.fasterxml.jackson.core" % "jackson-annotations" % "2.18.2" ))
-  .settings(libraryDependencies += ("com.fasterxml.jackson.core" % "jackson-databind"    % "2.18.2" ))
-  .settings(libraryDependencies += ("org.mozilla" % "rhino" % "1.7.15" ))
+  .dependsOn(avcComFasterXmlJacksonAnnotsLibsV2 )
+  .dependsOn(tvmRhinoJsEngineProject)
 
 lazy val tvmBuildServerProject
 =
@@ -423,6 +576,7 @@ lazy val mainFrontendProject
   )
   .asLeafProjectWithNecessarySettings(skipPlatforms = true )
   .dependsOn(tvmCommonsProject )
+  .dependsOn(avcTxcExtLibsLhyPPrintLib )
   .dependsOn(avcTxcExtLibsJLineV03 )
   .dependsOn(tvmToolchainCoreProject )
   .dependsOn(tvmBuildServerProject )
@@ -448,6 +602,7 @@ lazy val tvmToolchainCoreProject
   .asLeafProjectWithNecessarySettings(skipPlatforms = true )
   .dependsOn(tvmCommonsProject )
   .dependsOn(tvmInteropCoreProject )
+  .dependsOn(tvmNativeCommonsProject )
   .dependsOn(tvmCompilerProject )
   .dependsOn(tvmClasslibCoreProject )
   .settings(scalaVersion := suggestedScala3Dot07VersionV)

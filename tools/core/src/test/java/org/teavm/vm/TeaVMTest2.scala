@@ -1,4 +1,8 @@
-package org.teavm.vm
+package org.teavm
+
+package vm
+
+import org.teavm.dependency.DCS2.UNINITIALIZED
 
 
 

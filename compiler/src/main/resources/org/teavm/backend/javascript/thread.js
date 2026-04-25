@@ -30,16 +30,10 @@ TeaVMThread.prototype.push = function() {
     return this;
 };
 TeaVMThread.prototype.s = TeaVMThread.prototype.push;
-TeaVMThread.prototype.pop = function() {
-    return this.stack.pop();
-};
+TeaVMThread.prototype.pop = function() { return this.stack.pop(); };
 TeaVMThread.prototype.l = TeaVMThread.prototype.pop;
-TeaVMThread.prototype.isResuming = function() {
-    return this.status === 2;
-};
-TeaVMThread.prototype.isSuspending = function() {
-    return this.status === 1;
-};
+TeaVMThread.prototype.isResuming   = function() { return this.status === 2; };
+TeaVMThread.prototype.isSuspending = function() { return this.status === 1; };
 TeaVMThread.prototype.suspend = function(callback) {
     this.suspendCallback = callback;
     this.status = 1;
@@ -86,18 +80,9 @@ TeaVMThread.prototype.run = function() {
     }
 };
 
-let $rt_suspending = () => {
-    let thread = $rt_nativeThread();
-    return thread != null && thread.isSuspending();
-}
-let $rt_resuming = () => {
-    let thread = $rt_nativeThread();
-    return thread != null && thread.isResuming();
-}
-let $rt_suspend = callback => {
-    let nativeThread = $rt_requireNativeThread();
-    return nativeThread.suspend(callback);
-}
+let $rt_suspending  = ()    => { let       thread = $rt_nativeThread()       ; return thread != null && thread.isSuspending()   ; }
+let $rt_resuming    = ()    => { let       thread = $rt_nativeThread()       ; return thread != null && thread.isResuming()     ; }
+let $rt_suspend = callback  => { let nativeThread = $rt_requireNativeThread(); return nativeThread.suspend(callback)            ; }
 let $rt_requireNativeThread = () => {
     let nativeThread = $rt_nativeThread();
     if (nativeThread === null) {
@@ -107,7 +92,7 @@ let $rt_requireNativeThread = () => {
     }
     return nativeThread;
 }
-let $rt_startThread = (runner, callback) => new TeaVMThread(runner).start(callback);
+let $rt_startThread = (runner, /** @type {Function} */ callback) => new TeaVMThread(runner).start(callback);
 let $rt_currentNativeThread = null;
 let $rt_nativeThread = () => $rt_currentNativeThread;
 let $rt_invalidPointer = () => {
