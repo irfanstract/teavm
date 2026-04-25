@@ -163,6 +163,7 @@ final class TeaVMPluginReader {
     private static void processDescriptors(Map<String, PluginDescriptor> descriptors) {
         for (PluginDescriptor descriptor : descriptors.values()) {
             if (descriptor.after.length > 0 && descriptor.before.length > 0) {
+                /** If a plugin has both `@Before` and `@After` annotations, it creates a circular dependency, because it means that the plugin should be loaded both before and after some other plugins, which is not possible. Therefore, we throw an exception in such cases, to indicate that the plugin configuration is invalid. */
                 throw new IllegalStateException("Plugin " + descriptor.name
                         + " has both before and after annotations");
             }

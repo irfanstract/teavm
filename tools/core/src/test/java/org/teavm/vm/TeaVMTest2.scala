@@ -14,8 +14,9 @@ class TeaVMTest2 extends org.scalatest.refspec.RefSpec :
     def `example 01`() =
       locally { }
 
-    // def `example 02`() =
-    //   ().asInstanceOf[BigInt]
-    //   locally { }
+    def `example 02`() =
+      // ().asInstanceOf[BigInt]
+      new org.teavm.parsing.ClasspathClassHolderSource(UNINITIALIZED )
+      locally { }
 
 
