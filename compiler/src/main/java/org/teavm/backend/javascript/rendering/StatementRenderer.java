@@ -240,13 +240,13 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         }
         precedence = Precedence.COMMA;
         statement.getRightValue().acceptVisitor(this);
-        writer.append(";").softNewLine();
+        writer.append(";")/* .softNewLine() */.ws();
         if (statement.isAsync()) {
             emitSuspendChecker();
             if (statement.getLeftValue() != null) {
                 precedence = Precedence.COMMA;
                 statement.getLeftValue().acceptVisitor(this);
-                writer.ws().append("=").ws().append(context.tempVarName()).append(";").softNewLine();
+                writer.ws().append("=").ws().append(context.tempVarName()).append(";")/* .softNewLine() */.ws();
             }
         }
         if (statement.getLocation() != null) {
@@ -280,7 +280,7 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
                 writer.ws().append("{");
                 needClosingBracket = true;
             }
-            writer.softNewLine().indent();
+            writer/* .softNewLine() */.ws().indent();
             visitStatements(statement.getConsequent());
 
             if (!statement.getAlternative().isEmpty()) {
@@ -304,14 +304,14 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
                     writer.ws().append("{");
                     needClosingBracket = true;
                 }
-                writer.indent().softNewLine();
+                writer.indent()/* .softNewLine() */.ws();
                 visitStatements(statement.getAlternative());
             }
             break;
         }
         writer.outdent();
         if (needClosingBracket) {
-            writer.append("}").softNewLine();
+            writer.append("}")/* .softNewLine() */.ws();
         }
     }
 
@@ -339,10 +339,10 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         if (statement.getValue().getLocation() != null) {
             popLocation();
         }
-        writer.append(")").ws().append("{").softNewLine().indent();
+        writer.append(")").ws().append("{")/* .softNewLine() */.ws().indent();
         for (SwitchClause clause : statement.getClauses()) {
             for (int condition : clause.getConditions()) {
-                writer.append("case ").append(condition).append(":").softNewLine();
+                writer.append("case ").append(condition).append(":")/* .softNewLine() */.ws();
             }
             writer.indent();
             boolean oldEnd = end;
@@ -354,7 +354,7 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
             writer.outdent();
         }
         if (statement.getDefaultClause() != null) {
-            writer.append("default:").softNewLine().indent();
+            writer.append("default:")/* .softNewLine() */.ws().indent();
             boolean oldEnd = end;
             for (Statement part : statement.getDefaultClause()) {
                 end = false;
@@ -363,7 +363,7 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
             end = oldEnd;
             writer.outdent();
         }
-        writer.outdent().append("}").softNewLine();
+        writer.outdent().append("}")/* .softNewLine() */.ws();
     }
 
     @Override
@@ -380,14 +380,14 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         } else {
             writer.append("true");
         }
-        writer.append(")").ws().append("{").softNewLine().indent();
+        writer.append(")").ws().append("{")/* .softNewLine() */.ws().indent();
         boolean oldEnd = end;
         for (Statement part : statement.getBody()) {
             end = false;
             part.acceptVisitor(this);
         }
         end = oldEnd;
-        writer.outdent().append("}").softNewLine();
+        writer.outdent().append("}")/* .softNewLine() */.ws();
     }
 
     private String mapBlockId(String id) {
@@ -415,10 +415,21 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
     }
 
     @Override
-    public void visit(BlockStatement statement) {
-        writer.append(mapBlockId(statement.getId())).append(":").ws().append("{").softNewLine().indent();
-        visitStatements(statement.getBody());
-        writer.outdent().append("}").softNewLine();
+    public void visit(BlockStatement b) {
+        var statements = b.getBody();
+        writer.append(mapBlockId(b.getId())).append(":").ws();
+        if (statements.size() <= 2 ) {
+            writer.append("{");
+            writer.sameLineWs();
+            visitStatements(statements, true);
+            writer.append("}");
+        } else {
+            writer.append("{");
+            writer.softNewLine().indent();
+            visitStatements(statements, false);
+            writer.outdent();
+            writer.append("}");
+        }
     }
 
     @Override
@@ -431,7 +442,7 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         if (statement.getTarget() != null) {
             writer.append(' ').append(mapBlockId(statement.getTarget().getId()));
         }
-        writer.append(";").softNewLine();
+        writer.append(";")/* .softNewLine() */.ws();
         if (statement.getLocation() != null) {
             popLocation();
         }
@@ -447,7 +458,7 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         if (statement.getTarget() != null) {
             writer.append(' ').append(mapBlockId(statement.getTarget().getId()));
         }
-        writer.append(";").softNewLine();
+        writer.append(";")/* .softNewLine() */.ws();
         if (statement.getLocation() != null) {
             popLocation();
         }
@@ -465,7 +476,7 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
             precedence = Precedence.min();
             statement.getResult().acceptVisitor(this);
         }
-        writer.append(";").softNewLine();
+        writer.append(";")/* .softNewLine() */.ws();
         if (statement.getLocation() != null) {
             popLocation();
         }
@@ -480,7 +491,7 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         writer.appendFunction("$rt_throw").append("(");
         precedence = Precedence.min();
         statement.getException().acceptVisitor(this);
-        writer.append(");").softNewLine();
+        writer.append(");")/* .softNewLine() */.ws();
         if (statement.getLocation() != null) {
             popLocation();
         }
@@ -500,7 +511,7 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         if (statement.getLocation() != null) {
             pushLocation(statement.getLocation());
         }
-        writer.appendClassInit(statement.getClassName()).append("();").softNewLine();
+        writer.appendClassInit(statement.getClassName()).append("();")/* .softNewLine() */.ws();
         if (statement.isAsync()) {
             emitSuspendChecker();
         }
@@ -1431,6 +1442,10 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
     }
 
     private void visitStatements(List<Statement> statements) {
+        visitStatements(statements, statements.size() <= 2 );
+    }
+
+    private void visitStatements(List<Statement> statements, boolean sl) {
         if (statements.isEmpty()) {
             return;
         }
@@ -1438,15 +1453,17 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         for (int i = 0; i < statements.size() - 1; ++i) {
             end = false;
             statements.get(i).acceptVisitor(this);
+            if (sl) { writer.sameLineWs(); } else { writer.softNewLine(); }
         }
         end = oldEnd;
         statements.get(statements.size() - 1).acceptVisitor(this);
+        if (sl) { writer.sameLineWs(); } else { writer.softNewLine(); }
         end = oldEnd;
     }
 
     @Override
     public void visit(TryCatchStatement statement) {
-        writer.append("try").ws().append("{").softNewLine().indent();
+        writer.append("try").ws().append("{")/* .softNewLine() */.ws().indent();
         List<TryCatchStatement> sequence = new ArrayList<>();
         sequence.add(statement);
         List<Statement> protectedBody = statement.getProtectedBody();
@@ -1457,9 +1474,9 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         }
         visitStatements(protectedBody);
         writer.outdent().append("}").ws().append("catch").ws().append("($$e)")
-                .ws().append("{").indent().softNewLine();
+                .ws().append("{").indent()/* .softNewLine() */.ws();
         writer.append("$$je").ws().append("=").ws().appendFunction("$rt_wrapException").append("($$e);")
-                .softNewLine();
+                /* .softNewLine() */.ws();
         boolean first = true;
         boolean defaultHandlerOccurred = false;
         for (int i = sequence.size() - 1; i >= 0; --i) {
@@ -1478,12 +1495,12 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
             }
 
             if (catchClause.getExceptionType() != null || !first) {
-                writer.append("{").indent().softNewLine();
+                writer.append("{").indent()/* .softNewLine() */.ws();
             }
 
             if (catchClause.getExceptionVariable() != null) {
                 writer.append(variableName(catchClause.getExceptionVariable())).ws().append("=").ws()
-                        .append("$$je;").softNewLine();
+                        .append("$$je;")/* .softNewLine() */.ws();
             }
             visitStatements(catchClause.getHandler());
 
@@ -1498,13 +1515,13 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
             }
         }
         if (!defaultHandlerOccurred) {
-            writer.ws().append("else").ws().append("{").indent().softNewLine();
-            writer.append("throw $$e;").softNewLine();
-            writer.outdent().append("}").softNewLine();
+            writer.ws().append("else").ws().append("{").indent()/* .softNewLine() */.ws();
+            writer.append("throw $$e;")/* .softNewLine() */.ws();
+            writer.outdent().append("}")/* .softNewLine() */.ws();
         } else {
-            writer.softNewLine();
+            writer/* .softNewLine() */.ws();
         }
-        writer.outdent().append("}").softNewLine();
+        writer.outdent().append("}")/* .softNewLine() */.ws();
     }
 
     @Override
@@ -1515,9 +1532,9 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         }
         if (!end || statement.getPart() != currentPart + 1) {
             writer.ws();
-            writer.append("continue ").append(context.mainLoopName()).append(";").softNewLine();
+            writer.append("continue ").append(context.mainLoopName()).append(";")/* .softNewLine() */.ws();
         } else {
-            writer.softNewLine();
+            writer/* .softNewLine() */.ws();
         }
     }
 
@@ -1527,13 +1544,13 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
             writer.appendMethod(NameFrequencyEstimator.MONITOR_ENTER_METHOD).append("(");
             precedence = Precedence.min();
             statement.getObjectRef().acceptVisitor(this);
-            writer.append(");").softNewLine();
+            writer.append(");")/* .softNewLine() */.ws();
             emitSuspendChecker();
         } else {
             writer.appendMethod(NameFrequencyEstimator.MONITOR_ENTER_SYNC_METHOD).append('(');
             precedence = Precedence.min();
             statement.getObjectRef().acceptVisitor(this);
-            writer.append(");").softNewLine();
+            writer.append(");")/* .softNewLine() */.ws();
         }
     }
 
@@ -1541,7 +1558,7 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
         writer.append("if").ws().append("(").appendFunction("$rt_suspending").append("())").ws()
                 .append("{").indent().ws();
         writer.append("break ").append(context.mainLoopName()).append(";").ws();
-        writer.outdent().append("}").softNewLine();
+        writer.outdent().append("}")/* .softNewLine() */.ws();
     }
 
     @Override
@@ -1550,12 +1567,12 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
             writer.appendMethod(NameFrequencyEstimator.MONITOR_EXIT_METHOD).append("(");
             precedence = Precedence.min();
             statement.getObjectRef().acceptVisitor(this);
-            writer.append(");").softNewLine();
+            writer.append(");")/* .softNewLine() */.ws();
         } else {
             writer.appendMethod(NameFrequencyEstimator.MONITOR_EXIT_SYNC_METHOD).append('(');
             precedence = Precedence.min();
             statement.getObjectRef().acceptVisitor(this);
-            writer.append(");").softNewLine();
+            writer.append(");")/* .softNewLine() */.ws();
         }
     }
 
