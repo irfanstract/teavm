@@ -79,13 +79,10 @@ public class OutputSourceWriter extends SourceWriter implements LocationProvider
         if (letSequenceSize > 0) {
             letSequenceSize = 0;
             try {
-                innerWriter.append(";\n");
-                column = 0;
-                line++;
-                lineStart = true;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+                innerWriter.append(";");
+            } catch (IOException e) { throw new RuntimeException(e); }
+            /** PS: the original code which the following call replaced didn't have the `++offset;` call; please review */
+            trueNewLine();
         }
     }
 
@@ -293,15 +290,11 @@ public class OutputSourceWriter extends SourceWriter implements LocationProvider
         }
         finishLetImplicitly();
         if (lineStart) {
-            try {
+            {
                 for (int i = 0; i < indentSize; ++i) {
-                    innerWriter.append("    ");
-                    column += 4;
-                    offset += 4;
+                    trueSameLineWs();
                 }
                 lineStart = false;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
         }
     }
@@ -309,6 +302,11 @@ public class OutputSourceWriter extends SourceWriter implements LocationProvider
     @Override
     public SourceWriter newLine() {
         finishLetImplicitly();
+        trueNewLine();
+        return this;
+    }
+
+    protected SourceWriter trueNewLine() {
         try {
             innerWriter.append('\n');
         } catch (IOException e) {
@@ -328,13 +326,7 @@ public class OutputSourceWriter extends SourceWriter implements LocationProvider
         } else {
             if (!minified) {
                 finishLetImplicitly();
-                try {
-                    innerWriter.append(' ');
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                column++;
-                offset++;
+                trueSameLineWs();
             }
         }
         return this;
@@ -344,6 +336,13 @@ public class OutputSourceWriter extends SourceWriter implements LocationProvider
     public SourceWriter sameLineWs() {
         if (!minified) {
             finishLetImplicitly();
+            trueSameLineWs();
+        }
+        return this;
+    }
+
+    protected SourceWriter trueSameLineWs() {
+        {
             try {
                 innerWriter.append(' ');
             } catch (IOException e) {
@@ -366,16 +365,7 @@ public class OutputSourceWriter extends SourceWriter implements LocationProvider
     @Override
     public SourceWriter softNewLine() {
         if (!minified) {
-            finishLetImplicitly();
-            try {
-                innerWriter.append('\n');
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            column = 0;
-            ++offset;
-            ++line;
-            lineStart = true;
+            newLine();
         }
         return this;
     }

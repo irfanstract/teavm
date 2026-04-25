@@ -1511,10 +1511,13 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
     public void visit(GotoPartStatement statement) {
         if (statement.getPart() != currentPart) {
             writer.append(context.pointerName()).ws().append("=").ws().append(statement.getPart()).append(";")
-                    .softNewLine();
+                    ;
         }
         if (!end || statement.getPart() != currentPart + 1) {
+            writer.ws();
             writer.append("continue ").append(context.mainLoopName()).append(";").softNewLine();
+        } else {
+            writer.softNewLine();
         }
     }
 
@@ -1536,8 +1539,8 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
 
     public void emitSuspendChecker() {
         writer.append("if").ws().append("(").appendFunction("$rt_suspending").append("())").ws()
-                .append("{").indent().softNewLine();
-        writer.append("break ").append(context.mainLoopName()).append(";").softNewLine();
+                .append("{").indent().ws();
+        writer.append("break ").append(context.mainLoopName()).append(";").ws();
         writer.outdent().append("}").softNewLine();
     }
 

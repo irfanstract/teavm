@@ -33,8 +33,22 @@ public class ClasspathClassHolderSource implements ClassHolderSource, ClassDateP
         innerClassSource = new MapperClassHolderSource(classPathMapper);
     }
 
+    public ClasspathClassHolderSource(ClassLoader classLoader, ReferenceCache referenceCache) {
+        this(new ClasspathResourceProvider(classLoader ), referenceCache);
+    }
+
+    /**
+     * 
+     * @deprecated
+     * this overload sets, as `resourceProvider`, an implementation backed by a {@link ClassLoader} chosen arbitrarily (because there's not currently a known reliable means/heuristics to determine which one the most appropriate one is), which can lead to linking failures or even silently linking to wrong classpaths.
+     * Use the overload that takes a {@link ResourceProvider} instead, and provide an explicit {@link ResourceProvider} implementation that uses the desired {@link ClassLoader}.
+     * 
+     * <p> <code>@konsoletyper</code>'s TeaVM sets this to `ClasspathClassHolderSource.class.getClassLoader()`.
+     * unfortunately, that won't work on, say, JPMS, OSGi, or Android.
+     */
+    @Deprecated
     public ClasspathClassHolderSource(ReferenceCache referenceCache) {
-        this(new ClasspathResourceProvider(ClasspathClassHolderSource.class.getClassLoader()), referenceCache);
+        this(Thread.currentThread().getContextClassLoader(), referenceCache);
     }
 
     @Override

@@ -15,8 +15,8 @@
  */
 package org.teavm.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+// import com.fasterxml.jackson.annotation.JsonCreator;
+// import com.fasterxml.jackson.annotation.JsonValue;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -126,12 +126,12 @@ public record MethodReference(String className, MethodDescriptor descriptor) imp
     }
 
     @Override
-    @JsonValue
+    // @JsonValue
     public String toString() {
         return className + "." + getDescriptor().toString();
     }
 
-    @JsonCreator
+    // @JsonCreator
     public static MethodReference parse(String string) {
         MethodReference reference = parseIfPossible(string);
         if (reference == null) {

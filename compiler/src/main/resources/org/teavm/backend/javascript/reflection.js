@@ -30,11 +30,8 @@ let $rt_isAssignable = (from, to) => {
     if (from === to) {
         return true;
     }
-    let map = from[$rt_meta].assignableCache;
-    if (map === null) {
-        map = new Map();
-        from[$rt_meta].assignableCache = map;
-    }
+    let map = (from[$rt_meta].assignableCache ||= new Map() );
+    function setAndGetResult(to, result) { return (map.set(to, result), result); }
     let cachedResult = map.get(to);
     if (typeof cachedResult !== 'undefined') {
         return cachedResult;
@@ -42,25 +39,21 @@ let $rt_isAssignable = (from, to) => {
     if (to[$rt_meta].itemType !== null) {
         let result = from[$rt_meta].itemType !== null
                 && $rt_isAssignable(from[$rt_meta].itemType, to[$rt_meta].itemType);
-        map.set(to, result);
-        return result;
+        return setAndGetResult(to, result);
     }
     let parent = from[$rt_meta].parent;
     if (parent !== null && parent !== from) {
         if ($rt_isAssignable(parent, to)) {
-            map.set(to, true);
-            return true;
+            return setAndGetResult(to, true);
         }
     }
     let superinterfaces = from[$rt_meta].superinterfaces;
     for (let i = 0; i < superinterfaces.length; i = (i + 1) | 0) {
         if ($rt_isAssignable(superinterfaces[i], to)) {
-            map.set(to, true);
-            return true;
+            return setAndGetResult(to, true);
         }
     }
-    map.set(to, false);
-    return false;
+    return setAndGetResult(to, false);
 }
 let $rt_castToInterface = (obj, cls) => {
     if (obj !== null && !$rt_isInstance(obj, cls)) {

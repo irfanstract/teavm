@@ -224,11 +224,11 @@ public class MethodBodyRenderer implements MethodNodeVisitor, GeneratorContext {
 
         String popName = minifying ? "l" : "pop";
         String pushName = minifying ? "s" : "push";
-        writer.append(context.pointerName()).ws().append('=').ws().append("0;").softNewLine();
+        writer.append(context.pointerName()).ws().append('=').ws().append("0;").ws();
         writer.append("if").ws().append("(").appendFunction("$rt_resuming").append("())").ws()
-                .append("{").indent().softNewLine();
+                .append("{").indent().ws();
         writer.append("let ").append(context.threadName()).ws().append('=').ws()
-                .appendFunction("$rt_nativeThread").append("();").softNewLine();
+                .appendFunction("$rt_nativeThread").append("();").ws();
         writer.append(context.pointerName()).ws().append('=').ws().append(context.threadName()).append(".")
                 .append(popName).append("();");
         for (int i = variableCount - 1; i >= firstToSave; --i) {
@@ -236,7 +236,7 @@ public class MethodBodyRenderer implements MethodNodeVisitor, GeneratorContext {
                     .append(context.threadName())
                     .append(".").append(popName).append("();");
         }
-        writer.softNewLine();
+        writer.ws();
         writer.outdent().append("}").softNewLine();
 
         if (methodNode.getModifiers().contains(ElementModifier.SYNCHRONIZED)) {

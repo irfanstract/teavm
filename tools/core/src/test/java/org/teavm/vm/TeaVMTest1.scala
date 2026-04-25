@@ -11,6 +11,6 @@ class TeaVMTest1 extends org.scalatest.funsuite.AnyFunSuite :
     test("Demo 1") :
       TeaVMDemo.main()
 
-    // .
+    { }
 
 

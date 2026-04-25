@@ -29,6 +29,23 @@
     {
       "type": "scala",
       "request": "launch",
+      "name": "IXTVM Showcase",
+      "mainClass": "org.teavm.cli.TeaVMRunner1",
+      // "buildTarget": "file:/K:/Dev/FncPl2603/#mainFrontendProject/Compile",
+      "args": [
+        "--outfile=index.js",
+      ],
+      "jvmOptions": [
+        // /* https://stackoverflow.com/questions/71685564/native-library-loads-but-calling-native-function-throws-unsatisfiedlinkerror */
+        // "-Xlog:library=info",
+        "--enable-native-access=ALL-UNNAMED",
+      ],
+      // "env": {}
+      "envFile": ".env.local",
+    },
+    {
+      "type": "scala",
+      "request": "launch",
       "name": "jLineTerminalShowcase",
       "mainClass": "avcfw.fncpl.CcSubTwoPkgInternal.jLineTerminalShowcase",
       // "buildTarget": "file:/K:/Dev/FncPl2603/#avcTxcCompilersSubTwoProjectMain/Compile",

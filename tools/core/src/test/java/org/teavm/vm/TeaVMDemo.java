@@ -11,25 +11,21 @@ import org.teavm.backend.javascript.JavaScriptTarget;
 import org.teavm.model.ClassHolder;
 import org.teavm.model.ClassHolderSource;
 import org.teavm.parsing.ClasspathClassHolderSource;
+import org.teavm.parsing.ClasspathResourceProvider;
+import org.teavm.parsing.TransformedResourceProvider1;
+import org.teavm.classlib.impl.InmemStdLib;
 
 public class TeaVMDemo {
 
     public static void main(String... args) {
 
         ClassLoader classLoader = (
-          // ClassLoader.getSystemClassLoader()
-          Thread.currentThread().getContextClassLoader()
+            // ClassLoader.getSystemClassLoader()
+            //   Thread.currentThread().getContextClassLoader()
+            // TeaVMDemo.class.getClassLoader()
+            org.teavm.tooldemos.HelloWorldCli.class.getClassLoader()
         ) ; // obtain ClassLoader somewhere
-        ClassHolderSource classSource = new ClasspathClassHolderSource(new org.teavm.model.ReferenceCache() ) {
-            @Override
-            public ClassHolder get(String name) {
-                if (name.endsWith("jdk.internal.misc.Unsafe")) {
-                    System.err.println(String.format("refusing to resolve 'Unsafe': %s", name ) );
-                    return null ;
-                }
-                return super.get(name);
-            }
-        };
+        ClassHolderSource classSource = TeaVMDemoImpl.getAsClassHolderSource(classLoader) ;
         TeaVM vm = new TeaVMBuilder(new JavaScriptTarget() )
                 .setClassLoader(classLoader)
                 .setClassSource(classSource)
@@ -56,7 +52,7 @@ public class TeaVMDemo {
 							}
             }
         ));;
-        vm.setEntryPoint("org.teavm.vm.TeaVMDemo");
+        vm.setEntryPoint("org.teavm.tooldemos.HelloWorldCli");
         var bt = new MemoryBuildTarget();
         vm.build(bt, "index.js");
         // vm.checkForMissingItems();
@@ -75,6 +71,8 @@ public class TeaVMDemo {
             var c = new String(bt.getContent("index.js"), StandardCharsets.UTF_8 );
             if (c.length() <= 20000 ) {
                 System.err.println(String.format("File %s: %s", "index.js", c ) );
+            } else {
+                System.err.println(String.format("File %s: %s", "index.js", c.substring(0, 38000) ) );
             }
         }
 

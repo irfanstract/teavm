@@ -52,8 +52,8 @@ public record MethodDescriptor(String name, List<ValueType> paramTyps, ValueType
      * @deprecated please specify 'params' and 'return' separately.
      */
     @Deprecated
-    public MethodDescriptor(String name, ValueType... signature) {
-        this(name, List.of(signature));
+    public MethodDescriptor(/* String */ CharSequence name, ValueType... signature) {
+        this(name.toString(), List.of(signature));
     }
 
     /**
@@ -106,9 +106,9 @@ public record MethodDescriptor(String name, List<ValueType> paramTyps, ValueType
         return sb.toString();
     }
 
-    public static MethodDescriptor get(MethodHolder method) {
-        return new MethodDescriptor(method.getName(), method.getSignature());
-    }
+    // public static MethodDescriptor get(MethodHolder method) {
+    //     return new MethodDescriptor(method.getName(), method.getSignature());
+    // }
 
     public static MethodDescriptor parse(String text) {
         MethodDescriptor desc = parseIfPossible(text);

@@ -28,26 +28,16 @@ public class ConsoleTeaVMToolLog implements TeaVMToolLog {
     }
 
     @Override
+    public void info(String text, Throwable e) {
+        System.out.println("INFO: " + text);
+        e.printStackTrace(System.out);
+    }
+
+    @Override
     public void debug(String text) {
         if (debug) {
             System.out.println("DEBUG: " + text);
         }
-    }
-
-    @Override
-    public void warning(String text) {
-        System.out.println("WARNING: " + text);
-    }
-
-    @Override
-    public void error(String text) {
-        System.out.println("ERROR: " + text);
-    }
-
-    @Override
-    public void info(String text, Throwable e) {
-        System.out.println("INFO: " + text);
-        e.printStackTrace(System.out);
     }
 
     @Override
@@ -59,9 +49,19 @@ public class ConsoleTeaVMToolLog implements TeaVMToolLog {
     }
 
     @Override
+    public void warning(String text) {
+        System.out.println("WARNING: " + text);
+    }
+
+    @Override
     public void warning(String text, Throwable e) {
         System.out.println("WARNING: " + text);
         e.printStackTrace(System.out);
+    }
+
+    @Override
+    public void error(String text) {
+        System.out.println("ERROR: " + text);
     }
 
     @Override
