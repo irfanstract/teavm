@@ -16,7 +16,6 @@
 package org.teavm.ast;
 
 import org.teavm.ast.analysis.LocationGraphBuilder;
-import org.teavm.ast.optimization.AllBlocksCountVisitor;
 
 /**
  * <p> subclassed by classes that represent statements with an identifier, such as labeled statements and blocks. the identifier can be used to refer to the statement from other statements, such as break and continue statements.
@@ -26,7 +25,7 @@ import org.teavm.ast.optimization.AllBlocksCountVisitor;
  * 
  * <p> {@link IdentifiedStatement} is specifically designed to be used in the control flow graph of a method, where statements can have identifiers that can be used to refer to them from other statements. It is not intended to be used for all statements in the AST, but only for those that need to be identified and referred to from other statements.
  * used in classes like {@link LocationGraphBuilder} to build the control flow graph of a method, where statements can have identifiers that can be used to refer to them from other statements.
- * used in {@link AllBlocksCountVisitor} to count the number of blocks in a method, where statements can have identifiers that can be used to refer to them from other statements.
+ * used in {@link org.teavm.ast.optimization.AllBlocksCountVisitor AllBlocksCountVisitor} to count the number of blocks in a method, where statements can have identifiers that can be used to refer to them from other statements.
  * <del> used in classes like {@link LocationCounter} and {@link BlockCountVisitor} to count the number of times a block is entered or exited, which can be useful for optimization purposes. It is also used in classes like {@link ControlFlowGraphBuilder} to build the control flow graph of a method, where statements can have identifiers that can be used to refer to them from other statements. </del>
  * used for building control flow graph of a method, where statements can have identifiers that can be used to refer to them from other statements. It is not intended to be used for all statements in the AST, but only for those that need to be identified and referred to from other statements.
  * 

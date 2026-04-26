@@ -97,18 +97,18 @@ public enum ElementModifier {
         return value;
     }
 
-    public static int encodeModifiers(ClassReader cls) {
-        var modifiers = asModifiersInfo(cls.readModifiers(), cls.getLevel());
-        if (cls.hasModifier(ElementModifier.ANNOTATION)) {
-            var retention = cls.getAnnotations().get(Retention.class.getName());
-            if (retention != null && retention.getValue("value").getEnumValue().getFieldName().equals("RUNTIME")) {
-                if (cls.getAnnotations().get(Inherited.class.getName()) != null) {
-                    modifiers |= ModifiersInfo.INHERITED_ANNOTATION;
-                }
-            }
-        }
-        return modifiers;
-    }
+    // public static int encodeModifiers(ClassReader cls) {
+    //     var modifiers = asModifiersInfo(cls.readModifiers(), cls.getLevel());
+    //     if (cls.hasModifier(ElementModifier.ANNOTATION)) {
+    //         var retention = cls.getAnnotations().get(Retention.class.getName());
+    //         if (retention != null && retention.getValue("value").getEnumValue().getFieldName().equals("RUNTIME")) {
+    //             if (cls.getAnnotations().get(Inherited.class.getName()) != null) {
+    //                 modifiers |= ModifiersInfo.INHERITED_ANNOTATION;
+    //             }
+    //         }
+    //     }
+    //     return modifiers;
+    // }
 
     public static int asModifiersInfo(Set<ElementModifier> elementModifiers, AccessLevel level) {
         var modifiers = 0;

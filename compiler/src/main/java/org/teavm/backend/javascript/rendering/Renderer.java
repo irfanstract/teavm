@@ -54,6 +54,7 @@ import org.teavm.model.ClassHolder;
 import org.teavm.model.ClassHolderSource;
 import org.teavm.model.ClassReader;
 import org.teavm.model.ClassReaderSource;
+import org.teavm.model.EffectiveElementModifier;
 import org.teavm.model.ElementModifier;
 import org.teavm.model.FieldHolder;
 import org.teavm.model.FieldReference;
@@ -534,7 +535,7 @@ public class Renderer implements RenderingManager {
             }
             writer.append("],").ws();
 
-            var modifiers = ElementModifier.encodeModifiers(cls);
+            var modifiers = EffectiveElementModifier.encodeModifiers(cls);
             writer.append(modifiers).append(',').ws();
 
             if (!requiredMetadata.enclosingClass() && !requiredMetadata.declaringClass()

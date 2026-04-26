@@ -69,6 +69,7 @@ import org.teavm.ast.VariableExpr;
 import org.teavm.ast.WhileStatement;
 import org.teavm.backend.javascript.codegen.NamingStrategy;
 import org.teavm.backend.javascript.codegen.SourceWriter;
+import org.teavm.backend.javascript.rendering.ExprRenderingUtil;
 import org.teavm.backend.javascript.spi.Injector;
 import org.teavm.backend.javascript.spi.InjectorContext;
 import org.teavm.dependency.DependencyInfo;
@@ -704,8 +705,8 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
                     visitBinary(expr, "-", expr.getType() == OperationType.INT);
                     break;
                 case MULTIPLY:
-                    if (expr.getType() != OperationType.INT || RenderingUtil.isSmallInteger(expr.getFirstOperand())
-                            || RenderingUtil.isSmallInteger(expr.getSecondOperand())) {
+                    if (expr.getType() != OperationType.INT || ExprRenderingUtil.isSmallInteger(expr.getFirstOperand())
+                            || ExprRenderingUtil.isSmallInteger(expr.getSecondOperand())) {
                         visitBinary(expr, "*", expr.getType() == OperationType.INT);
                     } else {
                         visitBinaryFunction(expr, "$rt_imul");
@@ -1431,6 +1432,10 @@ public class StatementRenderer implements ExprVisitor, StatementVisitor {
     }
 
     private void visitStatements(List<Statement> statements) {
+        visitStatements(statements, statements.size() <= 2 );
+    }
+
+    private void visitStatements(List<Statement> statements, boolean sl) {
         if (statements.isEmpty()) {
             return;
         }

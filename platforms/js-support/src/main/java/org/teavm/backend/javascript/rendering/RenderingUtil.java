@@ -19,8 +19,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.teavm.ast.ConstantExpr;
-import org.teavm.ast.Expr;
+// import org.teavm.ast.ConstantExpr;
+// import org.teavm.ast.Expr;
 import org.teavm.backend.javascript.codegen.SourceWriter;
 import org.teavm.model.ValueType;
 
@@ -159,18 +159,22 @@ public final class RenderingUtil {
         return indexToId(index, VARIABLE_START_CHARS);
     }
 
-    public static boolean isSmallInteger(Expr expr) {
-        if (!(expr instanceof ConstantExpr)) {
-            return false;
-        }
+    // public static boolean isSmallInteger(Expr expr) {
+    //     if (!(expr instanceof ConstantExpr)) {
+    //         return false;
+    //     }
 
-        Object constant = ((ConstantExpr) expr).getValue();
-        if (!(constant instanceof Integer)) {
-            return false;
-        }
+    //     Object constant = ((ConstantExpr) expr).getValue();
+    //     if (!(constant instanceof Integer)) {
+    //         return false;
+    //     }
 
-        int value = (Integer) constant;
-        return Math.abs(value) < (1 << 18);
+    //     int value = (Integer) constant;
+    //     return Math.abs(value) < (1 << 18);
+    // }
+    @Deprecated
+    public static boolean isSmallInteger(Object expr) {
+        throw new UnsupportedOperationException();
     }
 
     public static void typeToClsString(SourceWriter writer, ValueType type) {
