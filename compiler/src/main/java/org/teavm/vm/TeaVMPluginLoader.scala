@@ -18,5 +18,10 @@ object TeaVMPluginLoader :
      */
     def load(classLoader: ClassLoader): java.lang.Iterable[TeaVMPlugin] =
         // loadThroughServiceLoaderApi(classLoader)
-        ???
+        locally :
+            locally :
+                Class.forName("org.teavm.classlib.impl.JCLPlugin", true, Thread.currentThread().getContextClassLoader() ).newInstance()
+                .asInstanceOf[TeaVMPlugin]
+            .pipe { Seq(_) }
+            .asJava
 

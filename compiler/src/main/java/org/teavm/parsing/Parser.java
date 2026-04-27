@@ -54,7 +54,7 @@ import org.teavm.model.Program;
 import org.teavm.model.ReferenceCache;
 import org.teavm.model.ValueType;
 import org.teavm.model.Variable;
-import org.teavm.model.optimization.UnreachableBasicBlockEliminator;
+// import org.teavm.model.optimization.UnreachableBasicBlockEliminator;
 import org.teavm.model.util.DefinitionExtractor;
 import org.teavm.model.util.PhiUpdater;
 import org.teavm.model.util.ProgramNodeSplittingBackend;
@@ -87,9 +87,9 @@ public class Parser {
             ProgramParser programParser = new ProgramParser(referenceCache);
             programParser.setFileName(fileName);
             Program program = programParser.parse(node);
-            var optimizer = new UnreachableBasicBlockEliminator();
-            optimizer.removeUnreachableInstructions(program);
-            optimizer.optimize(program);
+            // var optimizer = new UnreachableBasicBlockEliminator();
+            // optimizer.removeUnreachableInstructions(program);
+            // optimizer.optimize(program);
 
             Graph cfg = ProgramUtils.buildControlFlowGraph(program);
             if (GraphUtils.isIrreducible(cfg)) {

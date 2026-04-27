@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.teavm.ast.ControlFlowEntry;
+// import org.teavm.ast.ControlFlowEntry;
 import org.teavm.common.Graph;
 import org.teavm.common.GraphBuilder;
 import org.teavm.model.BasicBlock;
@@ -96,9 +96,9 @@ public final class ProgramUtils {
         return graphBuilder.build();
     }
 
-    public static ControlFlowEntry[] getLocationCFG(Program program) {
-        return new LocationGraphBuilder().build(program);
-    }
+    // public static ControlFlowEntry[] getLocationCFG(Program program) {
+    //     return new LocationGraphBuilder().build(program);
+    // }
 
     public static Program copy(ProgramReader program) {
         Program copy = new Program();

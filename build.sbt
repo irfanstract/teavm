@@ -436,6 +436,28 @@ lazy val tvmJvmAstProject
   .settings(scalacOptions += "-explain-cyclic" )
   // .settings(scalacOptions += "-Xcheck-macros" )
 
+lazy val tvmJvmAstUtilProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "jvmAstUtil" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmJvmAstProject )
+  .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
 lazy val tvmRhinoJsEngineProject
 =
   (
@@ -481,6 +503,101 @@ lazy val tvmCompilerUtilProject
   .settings(scalacOptions += "-explain-cyclic" )
   // .settings(scalacOptions += "-Xcheck-macros" )
 
+lazy val tvmCompilerInternalJvmAstBaselinesProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerInternals" / "JvmAstBaselines" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmJvmAstProject )
+  .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
+lazy val tvmCompilerInternalBufferedJvmAstProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerInternals" / "BufferedJvmAst" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmJvmAstProject )
+  .dependsOn(tvmJvmAstUtilProject )
+  .dependsOn(tvmCompilerIrAstProject )
+  .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  .dependsOn(tvmCompilerInternalClassFileResolverAndParserProject)
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
+lazy val tvmCompilerInternalDebugTreeProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerInternals" / "DebugTree" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmJvmAstProject )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
+lazy val tvmCompilerInternalClassFileResolverAndParserProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerInternals" / "ClassFileResolverAndParser" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmCommonsProject )
+  .dependsOn(tvmCompilerUtilProject )
+  .dependsOn(tvmInteropCoreProject )
+  .dependsOn(tvmJvmAstProject )
+  .dependsOn(tvmJvmAstUtilProject )
+  .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+  .dependsOn(avcComFasterXmlJacksonAnnotsLibsV2 )
+
 lazy val tvmCompilerIrAstProject
 =
   (
@@ -496,6 +613,7 @@ lazy val tvmCompilerIrAstProject
   .dependsOn(tvmCommonsProject )
   .dependsOn(tvmCompilerUtilProject )
   .dependsOn(tvmInteropCoreProject )
+  .dependsOn(tvmCompilerInternalDebugTreeProject )
   .dependsOn(tvmJvmAstProject )
   .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
   // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
@@ -507,6 +625,31 @@ lazy val tvmCompilerIrAstProject
   // .settings(scalacOptions += "-Xcheck-macros" )
   .dependsOn(avcComFasterXmlJacksonAnnotsLibsV2 )
   .dependsOn(tvmRhinoJsEngineProject)
+
+lazy val tvmCompilerIrAstOptimizerProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerIrAstOptimizer" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmCommonsProject )
+  .dependsOn(tvmCompilerUtilProject )
+  .dependsOn(tvmCompilerIrAstProject )
+  .dependsOn(tvmJvmAstProject )
+  .dependsOn(tvmJvmAstUtilProject )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
 
 lazy val tvmCompilerM2Project
 =
@@ -523,7 +666,13 @@ lazy val tvmCompilerM2Project
   .dependsOn(tvmCompilerUtilProject )
   .dependsOn(tvmInteropCoreProject )
   .dependsOn(tvmCompilerIrAstProject )
+  .dependsOn(tvmCompilerInternalDebugTreeProject )
   .dependsOn(tvmJvmAstProject )
+  .dependsOn(tvmCompilerInternalJvmAstBaselinesProject )
+  .dependsOn(tvmCompilerIrAstOptimizerProject )
+  .dependsOn(tvmCompilerInternalBufferedJvmAstProject )
+  .dependsOn(tvmCompilerInternalClassFileResolverAndParserProject )
+  .dependsOn(tvmJvmAstUtilProject )
   .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
   .dependsOn(tvmJsBackendSupportProject )
   // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
@@ -556,6 +705,7 @@ lazy val tvmCompilerProject
   .dependsOn(tvmCompilerM2Project )
   .dependsOn(tvmCompilerIrAstProject )
   .dependsOn(tvmJvmAstProject )
+  .dependsOn(tvmJvmAstUtilProject ) /* WORKAROUND */
   .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
   .dependsOn(tvmJsBackendSupportProject )
   // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
