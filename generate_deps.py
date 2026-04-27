@@ -14,8 +14,6 @@ import re
 import sys
 from collections import defaultdict, Counter
 
-ROOT = os.path.join('compiler', 'src', 'main')
-
 pkg_re = re.compile(r'^\s*package\s+([\w.]+)')
 type_re = re.compile(r'^\s*(?:public\s+)?(?:final\s+)?(?:abstract\s+)?(?:sealed\s+)?(?:class|interface|enum|trait|object)\s+([A-Za-z_]\w*)')
 import_re = re.compile(r'^\s*import\s+([^;]+)')
@@ -101,6 +99,12 @@ def pick_roots(pkgs, min_count=3):
     return roots
 
 def main():
+    m1(id = "jvmAstLib")
+    m1(id = "compilerIrAst")
+    m1(id = "compiler")
+
+def m1(id: str  ):
+    ROOT = os.path.join(id.lower(), 'src', 'main')
     files = collect_sources(ROOT)
     file_map = {}  # path -> (pkg, [types], [imports])
     packages = []
@@ -152,7 +156,7 @@ def main():
                         edges[(src, resolved)] += 1
 
     # emit DOT
-    print('digraph G {')
+    print(f'digraph {id.upper()}' + ' {')
     print('  rankdir=LR;')
     # nodes
     for n in sorted(nodes):
@@ -166,6 +170,7 @@ def main():
         attrs = f'label="{w}"' if w != 1 else ''
         print(f'  "{a_s}" -> "{b_s}" [{attrs}];')
     print('}')
+    print('')
 
 if __name__ == '__main__':
     main()

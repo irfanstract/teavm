@@ -4,48 +4,45 @@
 
 # modules
 
-## future modules
+## future modules (journal 2026/04/27 - ... )
 
-`tvmJvmAstUtilProject` (`<root>/jvmAstUtil`)
-  - on `tvmJvmAstProject` (`<root>/jvmAstLib`)
+### Set 1
 
-`tvmCompilerInternalJvmAstBaselinesProject` (`<root>/compilerInternals/JvmAstBaselines`)
+✅ `tvmJvmAstUtilProject` (`<root>/jvmAstUtil`)
+  - on `tvmJvmAstProject`
+
+✅ `tvmCompilerInternalJvmAstBaselinesProject` (`<root>/compilerInternals/JvmAstBaselines`)
   - "pure"
-  - also uses `tvmJvmAstProject` (`<root>/jvmAstLib`)
+  - also uses `tvmJvmAstProject`
 
-`tvmCompilerInternalBufferedJvmAstProject` (`<root>/compilerInternals/BufferedJvmAst`)
-  - on `tvmJvmAstProject` (`<root>/jvmAstLib`)
-  - also uses `tvmJvmAstUtilProject` (`<root>/jvmAstUtil`)
-  - also uses `tvmCompilerIrAstProject` (`<root>/compilerIrAst`)
-  - also uses `tvmCompilerInternalClassFileResolverAndParserProject` (`<root>/compilerInternals/ClassFileResolverAndParser`)
+✅ `tvmCompilerInternalBufferedJvmAstProject` (`<root>/compilerInternals/BufferedJvmAst`)
+  - on `tvmJvmAstProject`
+  - also uses `tvmJvmAstUtilProject`
+  - also uses `tvmCompilerIrAstProject`
+  - also uses `tvmCompilerInternalClassFileResolverAndParserProject`
 
-`tvmCompilerInternalJvmAstTransformsAndOptimsLibProject` (`<root>/compilerInternals/JvmAstTransformsAndOptimsLib`)
-  - on `tvmJvmAstProject` (`<root>/jvmAstLib`)
-  - uses `tvmCompilerInternalDependencyGraphProcessingProject` (`<root>/compilerInternals/DependencyGraphProcessing`)
-  - uses `tvmCompilerInternalJvmAstBaselinesProject` (`<root>/compilerInternals/JvmAstBaselines`)
-  - uses `tvmJvmAstUtilProject` (`<root>/jvmAstUtil`)
+`tvmCompilerInternalAstDepsAndTransformsAndOptimsKitProject` (`<root>/compilerInternals/AstDepsAndTransformsAndOptimsLib`)
+  - on `tvmCompilerUtilProject`
+  - also uses `tvmJvmAstProject`
+  - also uses `tvmCompilerInternalJvmAstBaselinesProject`
+  - also uses `tvmCompilerInternalBufferedJvmAstProject`
+  - also uses `tvmCompilerInternalClassFileResolverAndParserProject`
+  - also uses `tvmJvmAstUtilProject`
 
-`tvmCompilerInternalDebugTreeProject` (`<root>/compilerInternals/DebugTree`)
+✅ `tvmCompilerInternalDebugTreeProject` (`<root>/compilerInternals/DebugTree`)
   - "pure"
-  - also uses `tvmJvmAstProject` (`<root>/jvmAstLib`)
+  - also uses `tvmJvmAstProject` 
 
-`tvmCompilerInternalClassFileResolverAndParserProject` (`<root>/compilerInternals/ClassFileResolverAndParser`)
-  - on `tvmCompilerUtilProject` (`<root>/compilerUtil`)
-  - also uses `tvmJvmAstProject` (`<root>/jvmAstLib`)
-  - also uses `tvmJvmAstUtilProject` (`<root>/jvmAstUtil`)
+✅ `tvmCompilerInternalClassFileResolverAndParserProject` (`<root>/compilerInternals/ClassFileResolverAndParser`)
+  - on `tvmCompilerUtilProject`
+  - also uses `tvmJvmAstProject`
+  - also uses `tvmJvmAstUtilProject`
 
-`tvmCompilerInternalDependencyGraphProcessingProject` (`<root>/compilerInternals/DependencyGraphProcessing`)
-  - on `tvmCompilerUtilProject` (`<root>/compilerUtil`)
-  - also uses `tvmCompilerInternalBufferedJvmAstProject` (`<root>/compilerInternals/BufferedJvmAst`)
-  - also uses `tvmJvmAstProject` (`<root>/jvmAstLib`)
-  - also uses `tvmCompilerInternalJvmAstTransformsAndOptimsLibProject` (`<root>/compilerInternals/JvmAstTransformsAndOptimsLib`)
-  - also uses `tvmJvmAstUtilProject` (`<root>/jvmAstUtil`)
-  - also uses `tvmCompilerInternalClassFileResolverAndParserProject` (`<root>/compilerInternals/ClassFileResolverAndParser`)
-  - also uses `tvmCompilerInternalJvmAstBaselinesProject` (`<root>/compilerInternals/JvmAstBaselines`)
+✅ `tvmCompilerIrAstOptimizerProject` (`<root>/compilerIrAstOptimizer`)
+  - on `tvmCompilerIrAstProject`
+  - also uses `tvmJvmAstProject`
+  - also uses `tvmJvmAstUtilProject`
 
-`tvmCompilerIrAstOptimizerProject` (`<root>/compilerIrAstOptimizer`)
-  - on `tvmCompilerIrAstProject` (`<root>/compilerIrAst`)
-  - also uses `tvmJvmAstProject` (`<root>/jvmAstLib`)
-  - also uses `tvmJvmAstUtilProject` (`<root>/jvmAstUtil`)
+### Set 2
 
 
