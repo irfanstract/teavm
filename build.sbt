@@ -503,6 +503,29 @@ lazy val tvmCompilerUtilProject
   .settings(scalacOptions += "-explain-cyclic" )
   // .settings(scalacOptions += "-Xcheck-macros" )
 
+lazy val tvmCompilerInternalPluginSystemProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerInternals" / "AddonSystem" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmCommonsProject )
+  .dependsOn(tvmCompilerUtilProject )
+  .dependsOn(tvmInteropCoreProject )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
 lazy val tvmCompilerInternalJvmAstBaselinesProject
 =
   (
@@ -563,6 +586,50 @@ lazy val tvmCompilerInternalDebugTreeProject
   )
   .asLeafProjectWithNecessarySettings(skipPlatforms = true )
   .dependsOn(tvmJvmAstProject )
+  .dependsOn(tvmCompilerInternalWasmDebugTreeProject )
+  .dependsOn(tvmCompilerInternalJsDebugTreeProject )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
+lazy val tvmCompilerInternalWasmDebugTreeProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerInternals" / "WasmDebugTree" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmJvmAstProject )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
+lazy val tvmCompilerInternalJsDebugTreeProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerInternals" / "JsDebugTree" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmJvmAstProject )
   // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
   .settings(scalaVersion := suggestedScala3Dot07VersionV)
   .settings(scalacOptions ++= Seq("-source", "3.7") )
@@ -589,6 +656,62 @@ lazy val tvmCompilerInternalClassFileResolverAndParserProject
   .dependsOn(tvmJvmAstProject )
   .dependsOn(tvmJvmAstUtilProject )
   .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+  .dependsOn(avcComFasterXmlJacksonAnnotsLibsV2 )
+
+lazy val tvmCompilerInternalAstDepsAndTransformsAndOptimsKitProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerInternals" / "AstDepsAndTransformsAndOptimsLib" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmCommonsProject )
+  .dependsOn(tvmCompilerUtilProject )
+  .dependsOn(tvmJvmAstProject )
+  .dependsOn(tvmCompilerInternalJvmAstBaselinesProject )
+  .dependsOn(tvmCompilerInternalBufferedJvmAstProject )
+  .dependsOn(tvmCompilerInternalClassFileResolverAndParserProject )
+  .dependsOn(tvmJvmAstUtilProject )
+  .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+  .dependsOn(avcComFasterXmlJacksonAnnotsLibsV2 )
+
+lazy val tvmCompilerInternalEmitHostProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "compilerInternals" / "EmitHost" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmCompilerUtilProject )
+  .dependsOn(tvmCompilerIrAstProject )
+  .dependsOn(tvmJsBackendSupportProject )
+  .dependsOn(tvmJvmAstProject )
+  .dependsOn(tvmCompilerInternalJvmAstBaselinesProject )
+  .dependsOn(tvmJvmAstUtilProject )
   // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
   .settings(scalaVersion := suggestedScala3Dot07VersionV)
   .settings(scalacOptions ++= Seq("-source", "3.7") )
@@ -664,14 +787,18 @@ lazy val tvmCompilerM2Project
   )
   .asLeafProjectWithNecessarySettings(skipPlatforms = true )
   .dependsOn(tvmCompilerUtilProject )
+  .dependsOn(tvmCompilerInternalPluginSystemProject )
   .dependsOn(tvmInteropCoreProject )
   .dependsOn(tvmCompilerIrAstProject )
+  .dependsOn(tvmClasslibInnerCoreProject )
   .dependsOn(tvmCompilerInternalDebugTreeProject )
+  .dependsOn(tvmCompilerInternalEmitHostProject )
   .dependsOn(tvmJvmAstProject )
   .dependsOn(tvmCompilerInternalJvmAstBaselinesProject )
   .dependsOn(tvmCompilerIrAstOptimizerProject )
   .dependsOn(tvmCompilerInternalBufferedJvmAstProject )
   .dependsOn(tvmCompilerInternalClassFileResolverAndParserProject )
+  .dependsOn(tvmCompilerInternalAstDepsAndTransformsAndOptimsKitProject )
   .dependsOn(tvmJvmAstUtilProject )
   .dependsOn(avcTxcExtLibsObjectwebAsmV09 )
   .dependsOn(tvmJsBackendSupportProject )
@@ -701,6 +828,7 @@ lazy val tvmCompilerProject
   .asLeafProjectWithNecessarySettings(skipPlatforms = true )
   .dependsOn(tvmCommonsProject )
   .dependsOn(tvmCompilerUtilProject )
+  .dependsOn(tvmCompilerInternalPluginSystemProject )
   .dependsOn(tvmInteropCoreProject )
   .dependsOn(tvmCompilerM2Project )
   .dependsOn(tvmCompilerIrAstProject )
@@ -825,9 +953,31 @@ lazy val tvmClasslibCoreProject
     in (packagesParentDir / "classlib" )
   )
   .asLeafProjectWithNecessarySettings(skipPlatforms = true )
+  .dependsOn(tvmClasslibInnerCoreProject )
+  .dependsOn(tvmCompilerProject )
+  // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
+  .settings(scalaVersion := suggestedScala3Dot07VersionV)
+  .settings(scalacOptions ++= Seq("-source", "3.7") )
+  .settings(scalacOptions += "-preview" )
+  .settings(scalacOptions += "-explain" )
+  .settings(scalacOptions += "-explain-cyclic" )
+  // .settings(scalacOptions += "-Xcheck-macros" )
+
+lazy val tvmClasslibInnerCoreProject
+=
+  (
+    crossProject(
+      suggestedTargetPlatforms
+      .+:(JVMPlatform )
+      // .+:(JSPlatform )
+      : _* )
+    .withSuggestedSettings()
+    in (packagesParentDir / "classlibCore" )
+  )
+  .asLeafProjectWithNecessarySettings(skipPlatforms = true )
   .dependsOn(tvmCommonsProject )
   .dependsOn(tvmInteropCoreProject )
-  .dependsOn(tvmCompilerProject )
+  .dependsOn(tvmJvmAstProject )
   // .settings(libraryDependencies += Build.externalLibraryVersions.comMonix )
   .settings(scalaVersion := suggestedScala3Dot07VersionV)
   .settings(scalacOptions ++= Seq("-source", "3.7") )
