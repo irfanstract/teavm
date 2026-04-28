@@ -21,7 +21,7 @@ public class DependencyType {
     private ValueType valueType;
     int index;
 
-    DependencyType(ValueType valueType, int index) {
+    public DependencyType(ValueType valueType, int index) {
         this.valueType = valueType;
         this.index = index;
     }
