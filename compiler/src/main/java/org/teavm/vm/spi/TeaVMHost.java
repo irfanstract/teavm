@@ -24,8 +24,6 @@ import org.teavm.dependency.DependencyPlugin;
 import org.teavm.model.ClassHolderTransformer;
 import org.teavm.model.MethodReference;
 import org.teavm.parsing.resource.ResourceProvider;
-import org.teavm.vm.TeaVM;
-import org.teavm.vm.TeaVMBuilder;
 
 /**
  * <p>A host of plugins for TeaVM. Plugins are provided with this interface
@@ -52,7 +50,7 @@ public interface TeaVMHost extends ServiceRepository {
 
     /**
      * Gets class loaded that is used by TeaVM. This class loader is usually specified by
-     * {@link TeaVMBuilder#setClassLoader(ClassLoader)}
+     * {@link org.teavm.vm.TeaVMBuilder#setClassLoader(ClassLoader)}
      * @return class loader that can be used by plugins.
      */
     ClassLoader getClassLoader();
@@ -61,7 +59,7 @@ public interface TeaVMHost extends ServiceRepository {
 
     /**
      * Gets configuration properties. These properties are usually specified by
-     * {@link TeaVM#setProperties(Properties)}.
+     * {@link org.teavm.vm.TeaVM#setProperties(Properties)}.
      *
      * @return a copy of all of the VM properties. Any further changes to returned objects will not be
      * visible to VM.

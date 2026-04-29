@@ -25,13 +25,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.teavm.vm.spi.TvmJvmAstUtilLibSpecific;
 import org.teavm.model.BasicBlock;
 import org.teavm.model.Incoming;
 import org.teavm.model.Instruction;
 import org.teavm.model.Phi;
 import org.teavm.model.Program;
 import org.teavm.model.Variable;
-import org.teavm.model.optimization.RedundantJumpElimination;
+// import org.teavm.model.optimization.RedundantJumpElimination;
 
 public class BasicBlockSplitter {
     private Program program;
@@ -136,7 +137,13 @@ public class BasicBlockSplitter {
             }
         }
 
-        RedundantJumpElimination.optimize(program);
+        // RedundantJumpElimination.optimize(program);
+        // throw new UnsupportedOperationException("Redundant jump elimination is not supported in BasicBlockSplitter yet");
+        try {
+            Class.forName("org.teavm.model.optimization.RedundantJumpElimination", false, TvmJvmAstUtilLibSpecific.getStaticPluginClassLoader() ).getMethod("optimize", Program.class).invoke(null, program);
+        }
+        catch (java.lang.reflect.InvocationTargetException  e) { throw new RuntimeException("[BasicBlockSplitter] [fixProgram] [Redundant Jump Elimination] Failed:", e.getCause()  ); }
+        catch (ReflectiveOperationException                 e) { throw new RuntimeException("[BasicBlockSplitter] [fixProgram] [Redundant Jump Elimination] Failed:", e             ); }
     }
 
     private void fixIncomingsInExceptionHandler(BasicBlock source, List<Incoming> incomings) {

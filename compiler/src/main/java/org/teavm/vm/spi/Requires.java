@@ -20,8 +20,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * designates
+ * an item necessary for the plugin. If the item is not present, the plugin will not be applied.
+ * 
+ * This annotation is used to
+ * avoid applying plugins that require classes that are not present in the classpath. For example,
+ * 
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Requires {
-    Class<? extends TeaVMPlugin>[] value();
+    Class<?>[] value();
 }

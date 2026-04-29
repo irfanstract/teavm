@@ -162,4 +162,9 @@ public class DependencyAgent implements DependencyInfo, ServiceRepository {
     void cleanup() {
         analyzer = null;
     }
+
+    static DependencyAgent create(DependencyAnalyzer analyzer) {
+        return new DependencyAgent(analyzer);
+    }
+
 }

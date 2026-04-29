@@ -20,8 +20,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * designates
+ * an item to be executed beforehand.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Before {
-    Class<? extends TeaVMPlugin>[] value();
+    Class<?>[] value();
 }
