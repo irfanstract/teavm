@@ -129,12 +129,12 @@ public class ClassInference {
         }
 
         // See 1, 2, 3
-        MethodDependencyInfo thisMethodDep = dependencyInfo.getMethod(methodReference);
+        var thisMethodDep = dependencyInfo.getMethod(methodReference);
         buildPreliminaryGraphs(program, thisMethodDep);
 
         // Augment (2) with input types of method
         for (int i = 0; i <= methodReference.parameterCount(); ++i) {
-            ValueDependencyInfo paramDep = thisMethodDep.getVariable(i);
+            var paramDep = thisMethodDep.getVariable(i);
             if (paramDep != null) {
                 int degree = 0;
                 while (degree <= MAX_DEGREE) {
@@ -182,7 +182,7 @@ public class ClassInference {
     }
 
     public ValueType[] typesOf(int variableIndex) {
-        IntHashSet typeSet = types[nodeMapping[packNodeAndDegree(variableIndex, 0)]];
+        var typeSet = types[nodeMapping[packNodeAndDegree(variableIndex, 0)]];
         if (typeSet == null) {
             return new ValueType[0];
         }
@@ -196,14 +196,14 @@ public class ClassInference {
     }
 
     private void buildPreliminaryGraphs(Program program, MethodDependencyInfo thisMethodDep) {
-        GraphBuildingVisitor visitor = new GraphBuildingVisitor(program.variableCount(), dependencyInfo);
+        var visitor = new GraphBuildingVisitor(program.variableCount(), dependencyInfo);
         visitor.thisMethodDep = thisMethodDep;
-        for (BasicBlock block : program.getBasicBlocks()) {
+        for (var block : program.getBasicBlocks()) {
             visitor.currentBlock = block;
-            for (Phi phi : block.getPhis()) {
+            for (var phi : block.getPhis()) {
                 visitor.visit(phi);
             }
-            for (Instruction insn : block) {
+            for (var insn : block) {
                 insn.acceptVisitor(visitor);
             }
 
@@ -220,20 +220,20 @@ public class ClassInference {
         exceptions = visitor.exceptions.getAll();
         virtualCallSites = visitor.virtualCallSites.toArray(new VirtualCallSite[0]);
 
-        GraphBuilder arrayAssignmentGraphBuilder = new GraphBuilder(assignmentGraph.size());
+        var arrayAssignmentGraphBuilder = new GraphBuilder(assignmentGraph.size());
         for (int i = 0; i < assignmentGraph.size(); ++i) {
             for (int j : assignmentGraph.outgoingEdges(i)) {
                 arrayAssignmentGraphBuilder.addEdge(i, j);
             }
         }
-        for (ValueCast cast : casts) {
+        for (var cast : casts) {
             arrayAssignmentGraphBuilder.addEdge(cast.fromVariable, cast.toVariable);
         }
         arrayDataAssignmentGraph = arrayAssignmentGraphBuilder.build();
     }
 
     private void buildPropagationGraph() {
-        IntStack stack = new IntStack();
+        var stack = new IntStack();
 
         for (int i = 0; i < types.length; ++i) {
             if (types[i] != null || overflowTypes[i]) {
@@ -242,7 +242,7 @@ public class ClassInference {
         }
 
         boolean[] visited = new boolean[types.length];
-        GraphBuilder graphBuilder = new GraphBuilder(types.length);
+        var graphBuilder = new GraphBuilder(types.length);
 
         while (!stack.isEmpty()) {
             int entry = stack.pop();
@@ -319,7 +319,7 @@ public class ClassInference {
             //
             // End: calculating successor nodes in resulting graph
 
-            for (IntCursor next : nextEntries) {
+            for (var next : nextEntries) {
                 graphBuilder.addEdge(entry, next.value);
                 if (!visited[next.value]) {
                     stack.push(next.value);
@@ -349,7 +349,7 @@ public class ClassInference {
         Arrays.fill(types, null);
         Arrays.fill(overflowTypes, false);
 
-        GraphBuilder graphBuilder = new GraphBuilder(graph.size());
+        var graphBuilder = new GraphBuilder(graph.size());
         for (int i = 0; i < graph.size(); ++i) {
             for (int j : graph.outgoingEdges(i)) {
                 int from = nodeMapping[i];
@@ -364,7 +364,7 @@ public class ClassInference {
                 overflowTypes[node] = true;
                 types[node] = null;
             } else if (typesBackup[i] != null && !overflowTypes[i]) {
-                IntHashSet nodeTypes = getNodeTypes(node);
+                var nodeTypes = getNodeTypes(node);
                 if (nodeTypes.addAll(typesBackup[i]) > 0) {
                     if (nodeTypes.size() > overflowLimit) {
                         types[node] = null;
@@ -389,7 +389,7 @@ public class ClassInference {
         byte[] state = new byte[types.length];
         int[] path = new int[types.length];
         int pathSize = 0;
-        IntStack stack = new IntStack();
+        var stack = new IntStack();
 
         for (int i = 0; i < graph.size(); ++i) {
             if (graph.incomingEdgesCount(i) == 0 && (overflowTypes[i] || types[i] != null)) {
@@ -492,7 +492,7 @@ public class ClassInference {
     }
 
     private void propagateAlongCasts() {
-        for (ValueCast cast : casts) {
+        for (var cast : casts) {
             int toNode = nodeMapping[packNodeAndDegree(cast.toVariable, 0)];
             if (overflowTypes[toNode]) {
                 continue;
@@ -521,7 +521,7 @@ public class ClassInference {
                         nodeChanged[toNode] = true;
                         changed = true;
                     } else {
-                        for (String subclass : subclasses) {
+                        for (var subclass : subclasses) {
                             ValueType valueType = ValueType.object(subclass);
                             if (degree > 0) {
                                 valueType = ValueType.arrayOf(valueType);
@@ -550,7 +550,7 @@ public class ClassInference {
                     }
                 }
             } else {
-                for (IntCursor cursor : types[fromNode]) {
+                for (var cursor : types[fromNode]) {
                     if (targetTypes.contains(cursor.value)) {
                         continue;
                     }
@@ -573,7 +573,7 @@ public class ClassInference {
     private void propagateAlongVirtualCalls(Program program) {
         ClassReaderSource classSource = dependencyInfo.getClassSource();
 
-        for (VirtualCallSite callSite : virtualCallSites) {
+        for (var callSite : virtualCallSites) {
             if (callSite.receiverOverflow) {
                 continue;
             }
@@ -592,7 +592,7 @@ public class ClassInference {
                 } else {
                     var implementations = subclassListProvider.getMethods(callSite.method.getDescriptor());
                     if (implementations != null) {
-                        for (MethodReference methodReference : implementations) {
+                        for (var methodReference : implementations) {
                             mountVirtualMethod(program, callSite, methodReference);
                         }
                     }
@@ -600,7 +600,7 @@ public class ClassInference {
                 }
             } else {
                 var instanceNodeTypes = new ArrayList<String>();
-                for (IntCursor type : types[instanceNode]) {
+                for (var type : types[instanceNode]) {
                     if (callSite.knownClasses.contains(type.value)) {
                         continue;
                     }
@@ -612,20 +612,20 @@ public class ClassInference {
                 receiverTypes = instanceNodeTypes;
             }
 
-            for (String className : receiverTypes) {
+            for (var className : receiverTypes) {
                 int typeId = getTypeByValueType(ValueType.object(className));
                 if (!callSite.knownClasses.add(typeId)) {
                     continue;
                 }
 
-                MethodReference rawMethod = new MethodReference(className, callSite.method.getDescriptor());
-                MethodReader resolvedMethod = classSource.resolveImplementation(rawMethod);
+                var rawMethod = new MethodReference(className, callSite.method.getDescriptor());
+                var resolvedMethod = classSource.resolveImplementation(rawMethod);
 
                 if (resolvedMethod == null) {
                     continue;
                 }
 
-                MethodReference resolvedMethodRef = resolvedMethod.getReference();
+                var resolvedMethodRef = resolvedMethod.getReference();
                 mountVirtualMethod(program, callSite, resolvedMethodRef);
             }
         }
@@ -636,7 +636,7 @@ public class ClassInference {
             return;
         }
 
-        MethodDependencyInfo methodDep = dependencyInfo.getMethod(methodReference);
+        var methodDep = dependencyInfo.getMethod(methodReference);
         if (methodDep == null) {
             return;
         }
@@ -662,11 +662,11 @@ public class ClassInference {
                 continue;
             }
 
-            BasicBlock block = program.basicBlockAt(exceptions[i + 1]);
+            var block = program.basicBlockAt(exceptions[i + 1]);
             if (overflowTypes[variable]) {
                 propagateOverflowException(block);
             } else {
-                for (IntCursor type : types[variable]) {
+                for (var type : types[variable]) {
                     var valueType = typeList.get(type.value);
                     if (valueType instanceof ValueType.Object) {
                         var typeName = ((ValueType.Object) valueType).getClassName();
@@ -679,7 +679,7 @@ public class ClassInference {
 
     private void propagateException(String thrownTypeName, BasicBlock block) {
         for (TryCatchBlock tryCatch : block.getTryCatchBlocks()) {
-            String expectedType = tryCatch.getExceptionType();
+            var expectedType = tryCatch.getExceptionType();
             if (expectedType == null || hierarchy.isSuperType(expectedType, thrownTypeName, false)) {
                 if (tryCatch.getHandler().getExceptionVariable() == null) {
                     break;
@@ -688,7 +688,7 @@ public class ClassInference {
                 exceptionNode = nodeMapping[exceptionNode];
                 if (!overflowTypes[exceptionNode]) {
                     int thrownType = getTypeByValueType(ValueType.object(thrownTypeName));
-                    IntHashSet nodeTypes = getNodeTypes(exceptionNode);
+                    var nodeTypes = getNodeTypes(exceptionNode);
                     if (nodeTypes.add(thrownType)) {
                         nodeChanged[exceptionNode] = true;
                         changed = true;
@@ -706,7 +706,7 @@ public class ClassInference {
 
     private void propagateOverflowException(BasicBlock block) {
         for (TryCatchBlock tryCatch : block.getTryCatchBlocks()) {
-            Variable exceptionVar = tryCatch.getHandler().getExceptionVariable();
+            var exceptionVar = tryCatch.getHandler().getExceptionVariable();
             if (exceptionVar == null) {
                 continue;
             }
@@ -717,10 +717,10 @@ public class ClassInference {
                 continue;
             }
 
-            String expectedType = tryCatch.getExceptionType();
+            var expectedType = tryCatch.getExceptionType();
             List<? extends String> thrownTypes = subclassListProvider.getSubclasses(expectedType, false);
             if (thrownTypes != null) {
-                IntHashSet nodeTypes = getNodeTypes(exceptionNode);
+                var nodeTypes = getNodeTypes(exceptionNode);
                 for (String thrownTypeName : thrownTypes) {
                     int thrownType = getTypeByValueType(ValueType.object(thrownTypeName));
                     if (nodeTypes.add(thrownType)) {
@@ -777,7 +777,7 @@ public class ClassInference {
         }
 
         public void visit(Phi phi) {
-            for (Incoming incoming : phi.getIncomings()) {
+            for (var incoming : phi.getIncomings()) {
                 assignmentGraphBuilder.addEdge(incoming.getValue().getIndex(), phi.getReceiver().getIndex());
             }
         }
@@ -826,15 +826,15 @@ public class ClassInference {
 
         @Override
         public void visit(GetFieldInstruction insn) {
-            FieldDependencyInfo fieldDep = dependencyInfo.getField(insn.getField());
-            ValueDependencyInfo valueDep = fieldDep.getValue();
+            var fieldDep = dependencyInfo.getField(insn.getField());
+            var valueDep = fieldDep.getValue();
             readValue(valueDep, insn.getReceiver());
         }
 
         @Override
         public void visit(PutFieldInstruction insn) {
-            FieldDependencyInfo fieldDep = dependencyInfo.getField(insn.getField());
-            ValueDependencyInfo valueDep = fieldDep.getValue();
+            var fieldDep = dependencyInfo.getField(insn.getField());
+            var valueDep = fieldDep.getValue();
             writeValue(valueDep, insn.getValue());
         }
 
@@ -876,7 +876,7 @@ public class ClassInference {
             if (insn.getType() == InvocationType.VIRTUAL) {
                 int instance = insn.getInstance().getIndex();
 
-                VirtualCallSite callSite = new VirtualCallSite();
+                var callSite = new VirtualCallSite();
                 callSite.instance = instance;
                 callSite.method = insn.getMethod();
                 callSite.arguments = new int[insn.getArguments().size()];
@@ -899,7 +899,7 @@ public class ClassInference {
                 return;
             }
 
-            MethodDependencyInfo methodDep = dependencyInfo.getMethod(insn.getMethod());
+            var methodDep = dependencyInfo.getMethod(insn.getMethod());
             if (methodDep != null) {
                 if (insn.getReceiver() != null) {
                     readValue(methodDep.getResult(), insn.getReceiver());
@@ -959,7 +959,7 @@ public class ClassInference {
             return true;
         }
 
-        IntHashSet nodeTypes = getNodeTypes(node);
+        var nodeTypes = getNodeTypes(node);
         if (nodeTypes.add(typeId)) {
             nodeChanged[node] = true;
             changed = true;
