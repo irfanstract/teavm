@@ -1,0 +1,12 @@
+{
+  // "include": [
+  //   "**/*",
+  // ],
+  // "compilerOptions": {
+  //   // "emitDeclarationOnly": true,
+  //   "noEmit": true,
+  //   // "allowJs": true,
+  //   "checkJs": true,
+  //   "noImplicitAny": false,
+  // },
+}

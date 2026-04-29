@@ -94,6 +94,8 @@ object TeaVMPluginListFile {
 
 object TeaVMPluginResolution1 {
 
+    case object IT_DID
+
 } // TeaVMPluginResolution1
 
 private
