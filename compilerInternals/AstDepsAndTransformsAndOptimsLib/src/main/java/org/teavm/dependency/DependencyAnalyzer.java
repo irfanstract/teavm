@@ -132,7 +132,7 @@ public abstract class DependencyAnalyzer implements DependencyInfo {
         this.resourceProvider = resourceProvider;
         this.diagnostics = diagnostics;
         this.referenceCache = referenceCache;
-        agent = new DependencyAgent(this);
+        agent = DependencyAgent.create(this);
         this.classSource = new DependencyClassSource(agent, classSource, diagnostics, incrementalCache, platformTags);
         agentClassSource = this.classSource;
         classHierarchy = new ClassHierarchy(this.classSource);
